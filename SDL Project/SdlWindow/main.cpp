@@ -1,5 +1,5 @@
 #include <SDL.h>
-
+#include "DEBUGGER.h"
 int main(int argc, char* argv[])
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -10,5 +10,7 @@ int main(int argc, char* argv[])
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
 	SDL_Delay(3000);
+	DEBUGGER dbg = DEBUGGER::Instance();
+	dbg.log("Example log");
 	return 0;
 }
