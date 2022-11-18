@@ -1,6 +1,6 @@
 #include <SDL.h>
-#include "DEBUGGER.h"
 #include "Audio.h"
+#include <iostream>
 
 bool isRunning;
 void handleEvents();
@@ -11,32 +11,30 @@ int main(int argc, char* argv[])
 
 	Audio examplesound;
 
-
-
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window* window = SDL_CreateWindow("Hello world!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_SHOWN);
 	SDL_SetWindowMinimumSize(window, 100, 100);
 
 
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
-	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-	SDL_RenderClear(renderer);
-	SDL_RenderPresent(renderer);
 	isRunning = true;
+
+
 
 	while (isRunning) {
 		examplesound.load("C:/InnoLab SDL/BasicSDL/BasicSDL/PinkPanther60.wav");
 		examplesound.play();
 		handleEvents();
-		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-		SDL_RenderClear(renderer);
+		SDL_Surface* image = SDL_LoadBMP("C:/InnoLab SDL/BasicSDL/BasicSDL/x64/Debug/image.bmp");
+		if (!image) {
+			std::cout << "Fail to load image" << std::endl;
+		}
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image);
+		SDL_Rect dstrect = { 5, 5, 320, 240 };
+		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
 		SDL_RenderPresent(renderer);
 	}
 
-
-
-	DEBUGGER dbg = DEBUGGER::Instance();
-	dbg.log("Example log");
 	return 0;
 }
 
