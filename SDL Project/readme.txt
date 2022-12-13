@@ -1,0 +1,1 @@
+TTF include was copied and pasted into SDL2 include folder as well as lib/x86 etc so no further lib needs to be included in the project files.
