@@ -1,13 +1,21 @@
 #include <SDL.h>
 #include "Audio.h"
+#include "Timer.h"
 #include <iostream>
+#include <SDL_ttf.h>
+#include <string>
+#include <SDL_keyboard.h>
 
 bool isRunning;
 void handleEvents();
 using namespace std;
 void changeColor(SDL_Renderer* renderer);
+void arrowSounds();
 
-
+void use(Timer* time)
+{
+	time->use();
+}
 int main(int argc, char* argv[])
 {
 
@@ -19,11 +27,11 @@ int main(int argc, char* argv[])
 
 
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+	SDL_RenderPresent(renderer);
 	isRunning = true;
+	//changeColor(renderer);
 
-	changeColor(renderer);
-
-	while (isRunning) {
+	/*while (isRunning) {
 		examplesound.load("C:/Users/dario/source/repos/FantasyGameConsole/SDL Project/SdlWindow/PinkPanther60.wav");
 		examplesound.play();
 		handleEvents();
@@ -35,13 +43,83 @@ int main(int argc, char* argv[])
 		SDL_Rect dstrect = { 5, 5, 320, 240 };
 		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
 		SDL_RenderPresent(renderer);
-	}
+	}*/
 
+	arrowSounds();
 	return 0;
 }
 
+void arrowSounds()
+{
+	Audio up;
+	Audio down;
+	Audio left;
+	Audio right;
+	up.load("Resources/Button(Choice).wav");
+	down.load("Resources/Button(class).wav");
+	left.load("Resources/Button(click).wav");
+	right.load("Resources/Button(confirm).wav");
+	while (isRunning) // Game loop
+	{
+		// SDL_scancode.h shows you key keyboard key events
+		/*
+		    SDL_SCANCODE_RIGHT = 79,
+			SDL_SCANCODE_LEFT = 80,
+			SDL_SCANCODE_DOWN = 81,
+			SDL_SCANCODE_UP = 82,
+		*/
 
+		/*
+			In SDL events, there is a union which multiple Event types live inside.
+			One of these event types is SDL_KeyboardEvent, defined in SDL_Event under "key".
+			Viewing the definition of SDL_Event, you will see "keyboard events", which limits to key up, down and a few other
+			The information of which key is pressed resides inside those structures. So we need to access KeyBoardEvent through SDL_Event,
+			and dive deeper until we see the enums for the so called scancodes.
+			The scancode corresponding to the button is inside this key event inside.
+			We walk through those structures and do another switch statement, examining which button was pressed and react correspondingly.
+		*/
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) { // https://wiki.libsdl.org/SDL2/SDL_Event
+			switch (event.type) {
+			case SDL_KEYDOWN: // View definition to see other event types
+			{
+				switch (event.key.keysym.scancode) // Examine the scancode to see which button was pressed!
+				{
+				case SDL_SCANCODE_DOWN:
+					printf("On DOWN\n");
+					down.play();
+					break;
+				case SDL_SCANCODE_UP:
+					printf("On UP\n");
+					up.play();
+					break;
+				case SDL_SCANCODE_RIGHT:
+					printf("On RIGHT\n");
+					right.play();
+					break;
 
+				case SDL_SCANCODE_LEFT:
+					printf("On LEFT\n");
+					left.play();
+					break;
+				}
+				break;
+			}
+			case SDL_MOUSEBUTTONUP:
+			{
+				printf("On MOUSE UP\n");
+				left.play();
+				break;
+			}
+			case SDL_QUIT:
+				isRunning = false;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
 void handleEvents() {
 	SDL_Event event;
 	SDL_PollEvent(&event);
