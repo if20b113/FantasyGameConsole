@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	soundtrack.play();
 	//changeColor(renderer);
 	/*while (isRunning) {
-		examplesound.load("C:/Users/dario/source/repos/FantasyGameConsole/SDL Project/SdlWindow/PinkPanther60.wav");
+		examplesound.load("Resources/PinkPanther60.wav");
 		examplesound.play();
 		handleEvents();
 		SDL_Surface* image = SDL_LoadBMP("C:/Users/dario/source/repos/FantasyGameConsole/SDL Project/SdlWindow/x64/Debug/rickastley.bmp");
