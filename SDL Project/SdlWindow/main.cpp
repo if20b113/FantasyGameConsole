@@ -16,11 +16,9 @@ void use(Timer* time)
 {
 	time->use();
 }
+
 int main(int argc, char* argv[])
 {
-
-	Audio examplesound;
-
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window* window = SDL_CreateWindow("Hello world!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_SHOWN);
 	SDL_SetWindowMinimumSize(window, 100, 100);
@@ -29,8 +27,11 @@ int main(int argc, char* argv[])
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 	SDL_RenderPresent(renderer);
 	isRunning = true;
-	//changeColor(renderer);
 
+	Audio soundtrack;
+	soundtrack.load("Resources/soundtrack.wav");
+	soundtrack.play();
+	//changeColor(renderer);
 	/*while (isRunning) {
 		examplesound.load("C:/Users/dario/source/repos/FantasyGameConsole/SDL Project/SdlWindow/PinkPanther60.wav");
 		examplesound.play();
