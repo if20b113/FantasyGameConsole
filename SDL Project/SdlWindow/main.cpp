@@ -5,12 +5,12 @@
 #include <SDL_ttf.h>
 #include <string>
 #include <SDL_keyboard.h>
-
+#include "Scoreboard.h"
 bool isRunning;
 void handleEvents();
 using namespace std;
 void changeColor(SDL_Renderer* renderer);
-void arrowSounds();
+void arrowSounds(Scoreboard highscore, Scoreboard currentScore, Scoreboard highscorePoints, Scoreboard currentPoints, const string path, SDL_Renderer* renderer);
 
 void use(Timer* time)
 {
@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 	SDL_RenderPresent(renderer);
 	isRunning = true;
+
+	SDL_RenderSetLogicalSize(renderer, 1280, 720);
 
 	Audio soundtrack;
 	soundtrack.load("Resources/soundtrack.wav");
@@ -46,11 +48,31 @@ int main(int argc, char* argv[])
 		SDL_RenderPresent(renderer);
 	}*/
 
-	arrowSounds();
+	if (TTF_Init() == -1) {		//initialize SDL_ttf, returns 0 on success, -1 on error.
+		std::cout << "\nCould not initialize SDL2_ttf, error: " << TTF_GetError();
+	}
+	else {
+		std::cout << "\nSDL2_ttf system is ready to go!";
+	}
+
+	const string path = "resources/PublicPixel.ttf";
+
+	Scoreboard highscore(path, 24, "Highscore: ", { 255, 0, 0, 255 }, renderer);
+	Scoreboard currentScore(path, 24, "Current score: ", { 255, 0, 0, 255 }, renderer);
+
+	Scoreboard highscorePoints(0);
+	Scoreboard currentPoints(0);
+
+	highscorePoints.setPoints(0, path, renderer);
+	currentPoints.setPoints(0, path, renderer);
+
+
+
+	arrowSounds(highscore, currentScore, highscorePoints, currentPoints, path, renderer);
 	return 0;
 }
 
-void arrowSounds()
+void arrowSounds(Scoreboard highscore, Scoreboard currentScore, Scoreboard highscorePoints, Scoreboard currentPoints, const string path, SDL_Renderer* renderer)
 {
 	Audio up;
 	Audio down;
@@ -62,6 +84,18 @@ void arrowSounds()
 	right.load("Resources/Button(confirm).wav");
 	while (isRunning) // Game loop
 	{
+
+		highscore.display(20, 20, renderer);
+		currentScore.display(750, 20, renderer);
+		highscorePoints.display(300, 20, renderer);
+		currentPoints.display(1125, 20, renderer);
+
+		//SDL_RenderPresent(renderer);
+		//SDL_RenderClear(renderer);
+		//currentPoints.setPoints(10, path, renderer);
+		//SDL_RenderPresent(renderer);
+		
+
 		// SDL_scancode.h shows you key keyboard key events
 		/*
 		    SDL_SCANCODE_RIGHT = 79,
@@ -93,6 +127,9 @@ void arrowSounds()
 				case SDL_SCANCODE_UP:
 					printf("On UP\n");
 					up.play();
+					SDL_RenderClear(renderer);
+					currentPoints.setPoints(10, path, renderer);		//example as how to get points
+					SDL_RenderPresent(renderer);
 					break;
 				case SDL_SCANCODE_RIGHT:
 					printf("On RIGHT\n");
