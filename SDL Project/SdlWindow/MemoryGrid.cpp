@@ -86,14 +86,18 @@ void MemoryGrid::CenterGrid() {
 
 void MemoryGrid::drawCards(SDL_Renderer* ren) {
 
+	int Gridcardsleft = 0;
+
 	for (int i = 0; i < GridRows; i++) {
 
 		for (int y = 0; y < GridColumns; y++) {
 
 			MemoryGrid[i][y].drawCard(ren);
-			if (!MemoryGrid[i][y].isValid) {
-				CardsLeft--;
+			if (MemoryGrid[i][y].isValid) {
+				Gridcardsleft++;
 			}
 		}
 	}
+
+	CardsLeft = Gridcardsleft;
 }

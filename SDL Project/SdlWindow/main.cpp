@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
 				std::cout << "Exit button selected\n";
 				
 			}
-			if (keys[SDL_SCANCODE_K]) {
+			if (keys[SDL_SCANCODE_RETURN]) {
 				std::cout << "Enter pressed\n";
 
 				if (Menu.startButton.isSelected) {

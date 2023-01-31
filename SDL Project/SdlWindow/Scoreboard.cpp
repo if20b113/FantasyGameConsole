@@ -21,7 +21,7 @@ void Scoreboard::setPoints(int x, const std::string font_path, SDL_Renderer* ren
 	this->convertIntoString = std::to_string(this->points);
 	texture = loadFont(font_path, 24, convertIntoString, { 255, 0, 0, 255 }, renderer);
 	SDL_QueryTexture(texture, nullptr, nullptr, &text_rectangle.w, &text_rectangle.h);
-	std::cout << "\nPoints are at: " << points << "\n";
+	//std::cout << "\nPoints are at: " << points << "\n";
 }
 
 void Scoreboard::display(int x, int y, SDL_Renderer* renderer) {

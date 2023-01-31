@@ -2,13 +2,9 @@
 
 void Player::GetCard(Card* CardtoGet) {
 
-				if (ChosenCard1 != NULL && ChosenCard2 != NULL && ChosenCard1 != CardtoGet && ChosenCard2 != CardtoGet) {
+	if(CardtoGet->isValid){
 
-					ChosenCard1->FlipCard();
-					ChosenCard1 = CardtoGet;
-				}
-
-				if (ChosenCard1 != NULL && ChosenCard1 == CardtoGet) {
+				if (ChosenCard1 != NULL && ChosenCard1 == CardtoGet ) {
 
 					std::cout << "Card1Unselected\n";
 					ChosenCard1->FlipCard();
@@ -21,7 +17,6 @@ void Player::GetCard(Card* CardtoGet) {
 					ChosenCard2->FlipCard();
 					ChosenCard2 = NULL;
 				}
-
 				else if (ChosenCard1 == NULL) {
 					ChosenCard1 = CardtoGet;
 					std::cout << "Card1Selected\n";
@@ -34,8 +29,14 @@ void Player::GetCard(Card* CardtoGet) {
 					ChosenCard2->FlipCard();
 					// std::cout << ChosenCard2;
 				}
+				else if (ChosenCard1 != NULL && ChosenCard2 != NULL) {
 
+					ChosenCard1->FlipCard();
+					ChosenCard1 = CardtoGet;
+					ChosenCard1->FlipCard();
+				}
 
+	}
 }
 
 void Player::CheckCards() {
@@ -43,8 +44,8 @@ void Player::CheckCards() {
 	if (ChosenCard1 != NULL && ChosenCard2 != NULL && ChosenCard1->CardId == ChosenCard2->CardId) {
 		ChosenCard1->isValid = false;
 		ChosenCard2->isValid = false;
-		std::cout << ChosenCard1->CardId;
-		std::cout << ChosenCard2->CardId;
+		//std::cout << ChosenCard1->CardId;
+		//std::cout << ChosenCard2->CardId;
 		//Grid.CardsLeft -= 2;
 		Score += 10;
 		ChosenCard1 = NULL;
