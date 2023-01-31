@@ -6,6 +6,11 @@
 #include <string>
 #include <SDL_keyboard.h>
 #include "Scoreboard.h"
+#include "MainMenu.h"
+#include "KeyboardController.h"
+#include "MemoryGrid.h"
+#include "Player.h"
+
 bool isRunning;
 void handleEvents();
 using namespace std;
@@ -20,19 +25,27 @@ void use(Timer* time)
 int main(int argc, char* argv[])
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Window* window = SDL_CreateWindow("Hello world!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_SHOWN);
+	SDL_Window* window = SDL_CreateWindow("SDLMemoryGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 900, SDL_WINDOW_SHOWN);
 	SDL_SetWindowMinimumSize(window, 100, 100);
 
 
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	//SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+
+	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
 	isRunning = true;
+	Timer time(renderer);
+	MainMenu Menu(renderer, 1600,900);
+	const Uint8* keys = SDL_GetKeyboardState(NULL);
+	Player Player;
 
-	SDL_RenderSetLogicalSize(renderer, 1280, 720);
+	SDL_RenderSetLogicalSize(renderer, 1600, 900);
 
-	Audio soundtrack;
-	soundtrack.load("Resources/soundtrack.wav");
-	soundtrack.play();
+	//Audio soundtrack;
+	//soundtrack.load("Resources/soundtrack.wav");
+	//soundtrack.play();
 	//changeColor(renderer);
 	/*while (isRunning) {
 		examplesound.load("Resources/PinkPanther60.wav");
@@ -63,12 +76,160 @@ int main(int argc, char* argv[])
 	Scoreboard highscorePoints(0);
 	Scoreboard currentPoints(0);
 
-	highscorePoints.setPoints(0, path, renderer);
+	//highscorePoints.setPoints(0, path, renderer);
 	currentPoints.setPoints(0, path, renderer);
 
+	KeyboardController KeyBoardGrid(4, 4);
+
+	KeyboardController KeyBoardMainMenu(1, 2);
+
+	MemoryGrid Grid;
+
+	Card* ChosenCard1 = NULL;
+	Card* ChosenCard2 = NULL;
+
+	Grid.InitGrid(renderer, 4, 4, 1600, 900);
+
+	SDL_Event event;
+	SDL_PollEvent(&event);
+
+	while (isRunning) // Game loop
+	{
+		SDL_WaitEvent(&event);
+
+		Menu.updateButtons();
+
+		//highscore.display(20, 20, renderer);
+	
+		//highscorePoints.display(300, 20, renderer);
+		//currentPoints.display(1125, 20, renderer);
+		
+		//use(&time);
 
 
-	arrowSounds(highscore, currentScore, highscorePoints, currentPoints, path, renderer);
+		switch (event.type) {
+		case SDL_QUIT:
+			isRunning = false;
+			break;
+		case SDL_KEYUP:
+			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+				isRunning = false;
+			}
+			break;
+
+		case SDL_KEYDOWN:
+			if (Menu.Start) 
+			{
+				KeyBoardGrid.Testinput(keys);
+
+			}
+			else 
+			{
+				KeyBoardMainMenu.Testinput(keys);
+			}
+			if (KeyBoardMainMenu.curcolum == 1 && KeyBoardMainMenu.currow == 0) {
+
+				Menu.exitButton.isSelected = false;
+				Menu.startButton.isSelected = true;
+				std::cout << "Start button selected\n";
+			}
+			if (KeyBoardMainMenu.curcolum == 0 && KeyBoardMainMenu.currow == 0) {
+
+				Menu.startButton.isSelected = false;
+				Menu.exitButton.isSelected = true;
+				std::cout << "Exit button selected\n";
+				
+			}
+			if (keys[SDL_SCANCODE_K]) {
+				std::cout << "Enter pressed\n";
+
+				if (Menu.startButton.isSelected) {
+
+					Menu.Start = true;
+				}
+
+				if (Menu.exitButton.isSelected) {
+
+					isRunning = false;
+				}
+
+				if (Menu.Start)
+				{
+					Player.GetCard(&Grid.MemoryGrid[KeyBoardGrid.curcolum][KeyBoardGrid.currow]);
+				}
+
+				// Grid.MemoryGrid[KeyBoardGrid.curcolum][KeyBoardGrid.currow].FlipCard();
+				// std::cout << &Grid.MemoryGrid[KeyBoardGrid.curcolum][KeyBoardGrid.currow];
+
+				/*if (ChosenCard1 != NULL && ChosenCard1 == &Grid.MemoryGrid[KeyBoardGrid.curcolum][KeyBoardGrid.currow]) {
+
+					std::cout << "Card1Unselected\n";
+					ChosenCard1->FlipCard();
+					ChosenCard1 = NULL;
+				}
+
+				else if (ChosenCard2 != NULL && ChosenCard2 == &Grid.MemoryGrid[KeyBoardGrid.curcolum][KeyBoardGrid.currow]) {
+
+					std::cout << "Card2Unselected\n";
+					ChosenCard2->FlipCard();
+					ChosenCard2 = NULL;
+				}
+
+				else if (ChosenCard1 == NULL) {
+					ChosenCard1 = &Grid.MemoryGrid[KeyBoardGrid.curcolum][KeyBoardGrid.currow];
+					std::cout << "Card1Selected\n";
+					ChosenCard1->FlipCard();
+					std::cout << ChosenCard2;
+				}
+				else if (ChosenCard2 == NULL) {
+					ChosenCard2 = &Grid.MemoryGrid[KeyBoardGrid.curcolum][KeyBoardGrid.currow];
+					std::cout << "Card2Selected\n";
+					ChosenCard2->FlipCard();
+					std::cout << ChosenCard2;
+				}*/
+			}
+			break;
+		}
+
+		
+
+		if (Grid.CardsLeft <= 0) {
+
+			isRunning = false;
+		}
+
+		/*
+		if (ChosenCard1 != NULL && ChosenCard2 != NULL && ChosenCard1->CardId == ChosenCard2->CardId) {
+			ChosenCard1->isValid = false;
+			ChosenCard2->isValid = false;
+			std::cout << ChosenCard1->CardId;
+			std::cout << ChosenCard2->CardId;
+			Grid.CardsLeft -= 2;
+			
+			ChosenCard1 = NULL;
+			ChosenCard2 = NULL;
+		}*/
+
+		Player.CheckCards();
+		currentPoints.setPoints(Player.Score, path, renderer);
+
+		SDL_RenderClear(renderer);
+		Menu.drawButtons(renderer);
+		if (Menu.Start) {
+
+			Grid.drawCards(renderer);
+			currentScore.display(750, 20, renderer);
+			currentPoints.display(1125, 20, renderer);
+		}
+		
+		SDL_RenderPresent(renderer);
+
+	}
+	//arrowSounds(highscore, currentScore, highscorePoints, currentPoints, path, renderer);
+
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 	return 0;
 }
 
@@ -89,6 +250,8 @@ void arrowSounds(Scoreboard highscore, Scoreboard currentScore, Scoreboard highs
 		currentScore.display(750, 20, renderer);
 		highscorePoints.display(300, 20, renderer);
 		currentPoints.display(1125, 20, renderer);
+
+
 
 		//SDL_RenderPresent(renderer);
 		//SDL_RenderClear(renderer);
