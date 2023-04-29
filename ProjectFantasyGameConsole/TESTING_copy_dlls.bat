@@ -1,0 +1,5 @@
+set TARGET=build\testing\Debug\
+
+copy external_deps\sdl2\SDL2.dll %TARGET%
+copy external_deps\sdl2_ttf\SDL2_ttf.dll %TARGET%
+copy build\engine\Debug\FantasyGameEngine.dll %TARGET%
