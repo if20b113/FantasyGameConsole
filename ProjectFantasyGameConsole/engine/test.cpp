@@ -1,7 +1,12 @@
 #include <stdio.h>
-#include "FantasyGameEngine.hpp"
+
 #include "SDL.h"
 #include "SDL_ttf.h"
+
+#include "lua.hpp"
+#include "sol/sol.hpp"
+
+#include "FantasyGameEngine.hpp"
 
 namespace FantasyGameEngine {
 
@@ -46,6 +51,53 @@ namespace FantasyGameEngine {
         SDL_Delay(2000);
         SDL_DestroyWindow(window);
         SDL_Quit();
+    }
+
+    int native_func(int param1)
+    {
+        printf("called native func with param %d!\n", param1);
+        return param1 * 2;
+    }
+
+    void print_lua_entities(const sol::table &entities)
+    {
+        for (const auto& key_value_pair : entities) 
+        {
+            auto entity_id = key_value_pair.first.as<std::string>();
+            auto entity = key_value_pair.second.as<sol::table>();
+
+            printf("entity %s position: %f\n", entity_id.c_str(), (float)entity["pos"]);
+        }
+    }
+
+    void test_lua()
+    {
+        sol::state lua {};
+        lua.open_libraries(sol::lib::base);
+
+        lua.script("print('Hello World from compiled lua string!')");
+    
+        lua.set_function("native_func", &native_func);
+        
+        lua.script_file("assets/scripts/test.lua");
+
+        const std::function<void(float)>& lua_func = lua["scripting_example_update"];
+        
+        printf("calling scripting_example_update from c++ ...\n");
+        lua_func(2);
+        print_lua_entities(lua["entities"]);
+
+
+        printf("calling scripting_example_update from c++ again...\n");
+        lua_func(3);
+        print_lua_entities(lua["entities"]);
+
+        auto error_result = lua.script_file("assets/scripts/test_error.lua", &sol::script_pass_on_error);
+        if (!error_result.valid())
+        {
+            sol::error error = error_result;
+            std::cout << error.what() << std::endl;
+        }
     }
 
     int add(int a, int b)

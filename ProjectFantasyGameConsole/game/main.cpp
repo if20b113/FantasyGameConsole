@@ -4,5 +4,6 @@
 
 int main()
 {
+	FantasyGameEngine::test_lua();
 	FantasyGameEngine::test_sdl();
 }
