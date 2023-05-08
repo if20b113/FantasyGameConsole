@@ -14,4 +14,5 @@ public:
 
 private:
     std::vector<TTF_Font*> m_fonts;
+    // we store the different fonts we will be using in a vector, so we dont have to load every font repeatedly if used multiple times
 };
