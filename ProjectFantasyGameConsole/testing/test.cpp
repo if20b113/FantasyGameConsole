@@ -3,12 +3,12 @@
 
 TEST(sampletests, t1)
 {
-    EXPECT_EQ(FantasyGameEngine::add(1, 5), 6);
+    EXPECT_EQ(FGE::add(1, 5), 6);
 }
 
 TEST(sampletests, t2)
 {
-    EXPECT_EQ(FantasyGameEngine::add(2, 2), 4);
+    EXPECT_EQ(FGE::add(2, 2), 4);
 }
 
 int main(int argc, char** argv)

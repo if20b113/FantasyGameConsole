@@ -7,7 +7,7 @@
 #  define FGE_API
 #endif
 
-namespace FantasyGameEngine {
+namespace FGE {
 
 	FGE_API void test_sdl();
 	FGE_API void test_lua();

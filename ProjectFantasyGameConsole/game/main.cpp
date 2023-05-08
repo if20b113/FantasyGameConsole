@@ -1,9 +1,12 @@
 #include <stdio.h>
-
+#include <iostream>
+#include "Engine.h"
 #include "FantasyGameEngine/FantasyGameEngine.hpp"
 
 int main()
 {
-	FantasyGameEngine::test_lua();
-	FantasyGameEngine::test_sdl();
+	FGE::test_lua();
+	FGE::test_sdl();
+	FGE::Engine eng;
+	system("pause");
 }

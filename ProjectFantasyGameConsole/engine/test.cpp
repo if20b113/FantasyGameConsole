@@ -8,7 +8,7 @@
 
 #include "FantasyGameEngine.hpp"
 
-namespace FantasyGameEngine {
+namespace FGE {
 
     void test_sdl()
     {
