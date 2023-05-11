@@ -37,7 +37,6 @@ struct WindowStorage
 struct WindowConfig
 {
 	// Default config. Load in values from outside (to do)
-	//const char* title;
 	int x = SDL_WINDOWPOS_CENTERED;
 	int y = SDL_WINDOWPOS_CENTERED;
 	int w = 600;

@@ -2,10 +2,16 @@
 #include <iostream>
 namespace FGE
 {
-	Engine::Engine() : m_SdlInitialized{ false } // Not setting engine active
+	Engine::Engine()
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
+	}
+	Engine::Engine(WindowConfig const cfg)
+	{
+		// Do Setup
+		std::cout << "Hello from Engine" << std::endl;
+		Window
 	}
 	Engine::~Engine()
 	{
@@ -26,6 +32,10 @@ namespace FGE
 	bool Engine::ObjectExists(std::string const objName)
 	{
 		return m_Objects.find(objName) == m_Objects.end() ? true : false;
+	}
+	void Engine::CreateEngineWindow()
+	{
+
 	}
 	void Engine::SetObjectActive(std::string const objName)
 	{
