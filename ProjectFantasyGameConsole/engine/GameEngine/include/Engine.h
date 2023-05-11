@@ -9,9 +9,10 @@
 #include "Renderer.h"
 #include "WindowManager.h"
 
-typedef std::map<std::string, GameObject&> ObjMap;
 namespace FGE
 {
+	typedef std::shared_ptr<GameObject> GameObjectPtr;
+	typedef std::map<std::string, GameObjectPtr> ObjMap;
 	class Engine
 	{
 	private:
@@ -22,8 +23,8 @@ namespace FGE
 	private: // Member variables
 		ObjMap m_Objects;
 		Vec2D m_Dimensions;
-		EngineRenderer& m_Renderer;
-		//Window m_Window;
+		//EngineRenderer& m_Renderer;
+		Window m_Window;
 
 	private: // Object internal methods
 		bool ObjectExists(std::string const objName);
@@ -32,6 +33,7 @@ namespace FGE
 	private: // Window Methods
 		Window& CreateEngineWindow();
 		Window& CreateEngineWindow(WindowConfig const cfg);
+
 	private: // Renderer Methods
 
 	public:
@@ -42,8 +44,6 @@ namespace FGE
 		void RenderObject(std::string const objName);
 		void SetObjectActive(std::string const objName);
 		bool CreateObject(ObjectType const eObjType, std::string const objName, int const x = 0, int const y = 0);
-		//void BindObjectToEvent(std::string const objName, EventType eEventType, void** fnc); // Bind objects to events. Use function pointers to bind event on enter
-
 
 		// Handle events
 		bool OnEvent(); // Switch statement location xy(z). Check collision with objects. Check bound events. Do overloaded events

@@ -4,7 +4,7 @@
 #include <string>
 #include "GameObject.h"
 
-class ImageObject : GameObject, Vec2D // Inherits protected and public GO/VEC2
+class ImageObject : FGE::GameObject, Vec2D // Inherits protected and public GO/VEC2
 {
 
 public:

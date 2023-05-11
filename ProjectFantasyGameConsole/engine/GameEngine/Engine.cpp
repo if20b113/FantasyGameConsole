@@ -1,17 +1,19 @@
 #include "Engine.h"
+#include "GameObject.h"
 #include <iostream>
 namespace FGE
 {
-	Engine::Engine() : m_Renderer{ CreateEngineWindow() };
+	Engine::Engine()
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
-		CreateEngineWindow();
+		m_Window = CreateEngineWindow();
 	}
 	Engine::Engine(WindowConfig const cfg)
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
+		m_Window = CreateEngineWindow(cfg);
 	}
 	Engine::~Engine()
 	{
@@ -23,9 +25,9 @@ namespace FGE
 		if (find != m_Objects.end())
 		{
 			auto scnd = find->second;
-			if (scnd.Renderable() && scnd.Active())
+			if (scnd->Renderable() && scnd->Active())
 			{
-				// Do render
+				// Do render or whatever
 			}
 		}
 	}
@@ -35,7 +37,7 @@ namespace FGE
 	}
 	Window& Engine::CreateEngineWindow()
 	{
-		return Window();
+		return Window(); // to be remade
 	}
 	Window& Engine::CreateEngineWindow(WindowConfig const cfg)
 	{
@@ -55,7 +57,7 @@ namespace FGE
 			// Add log
 			return false;
 		}
-		m_Objects.emplace(objName, GameObject(eObjType, x, y));
+		m_Objects.emplace(objName, GameObjectPtr(eObjType));
 		if (ObjectExists(objName))
 		{
 			return true;
@@ -63,13 +65,6 @@ namespace FGE
 		// Add log
 		return false;
 	}
-	GameObject::GameObject(ObjectType const objType, int const x, int const y) : m_IsActive{false}
-	{
-		m_ObjType = objType;
-		m_Renderable = objType >= FGE::ENUM_RENDERABLE_START ? true : false; // If objecttype >= 100 then it's renderable
-		m_Dimensions.SetVector(x,y);
-		// Add log
-		// Object created ...
-	}
+	
 
 }
