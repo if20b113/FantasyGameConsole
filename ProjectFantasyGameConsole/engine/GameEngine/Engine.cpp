@@ -2,16 +2,16 @@
 #include <iostream>
 namespace FGE
 {
-	Engine::Engine()
+	Engine::Engine() : m_Renderer{ CreateEngineWindow() };
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
+		CreateEngineWindow();
 	}
 	Engine::Engine(WindowConfig const cfg)
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
-		Window
 	}
 	Engine::~Engine()
 	{
@@ -33,9 +33,13 @@ namespace FGE
 	{
 		return m_Objects.find(objName) == m_Objects.end() ? true : false;
 	}
-	void Engine::CreateEngineWindow()
+	Window& Engine::CreateEngineWindow()
 	{
-
+		return Window();
+	}
+	Window& Engine::CreateEngineWindow(WindowConfig const cfg)
+	{
+		return Window(cfg);
 	}
 	void Engine::SetObjectActive(std::string const objName)
 	{

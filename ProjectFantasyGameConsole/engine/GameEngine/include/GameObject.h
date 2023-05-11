@@ -1,4 +1,6 @@
-
+#include <iostream>
+#include <vector>
+#include "Vec.h"
 constexpr int ENUM_RENDERABLE_START = 100;
 // Defines the minimum number of an enum that will be renderable by the SDL renderer (pictures, text...)
 // Why is this done? When a render function is called, the object needs to be renderable. 
@@ -39,15 +41,20 @@ public:
 // like a Prop TO DO
 class GameObject
 {
-private:
+protected:
+	// SDL Types
+protected:
 	ObjectType m_ObjType;
-	std::vector<Event> m_Events;
+	std::vector<Event> m_Events; // Events that can be triggered for this object
 	bool m_IsActive;
 	bool m_Renderable;
-private: // Keep them separate for logical view
-	Vec2D m_Dimensions;
+
+// Removed. Not every object will have dimensions. Use Vec2 inheritance to implement
+//protected:
+	//Vec2D m_Dimensions;
 public:
-	GameObject(ObjectType const objType, int const x = 0, int const y = 0);
+	GameObject(){};
+	GameObject(ObjectType const objType);
 	ObjectType Type() { return m_ObjType; }
 	bool Renderable() { return m_Renderable; }
 	bool Active() { return m_IsActive; }
@@ -55,4 +62,6 @@ public:
 	// Virtual functions. Add Lua support to adjust what's inside the function or rewrite
 	// virtual void OnMouseDown()
 	// virtual void OnCollision()
+
+	virtual void CheckInteract(GameObject& const other);
 };

@@ -22,15 +22,16 @@ namespace FGE
 	private: // Member variables
 		ObjMap m_Objects;
 		Vec2D m_Dimensions;
-		EngineRenderer m_Renderer;
-		Window m_Window;
+		EngineRenderer& m_Renderer;
+		//Window m_Window;
 
 	private: // Object internal methods
 		bool ObjectExists(std::string const objName);
 		bool IsObjectActive(std::string const objName);
 
 	private: // Window Methods
-		void CreateEngineWindow();
+		Window& CreateEngineWindow();
+		Window& CreateEngineWindow(WindowConfig const cfg);
 	private: // Renderer Methods
 
 	public:

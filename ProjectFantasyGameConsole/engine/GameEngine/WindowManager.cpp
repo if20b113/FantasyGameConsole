@@ -22,7 +22,7 @@ namespace FGE
 		catch (std::exception e)
 		{
 			// SDl log e.what()
-			exit();
+			//exit();
 		}
 	}
 }

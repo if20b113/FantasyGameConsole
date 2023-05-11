@@ -17,7 +17,7 @@ namespace FGE
 	private:
 		SDL_Window* m_window;
 		WindowConfig m_cfg;
-		bool CreateWindow();
+		//bool CreateWindow();
 	public:
 		Window(); // Using default configuration
 		Window(WindowConfig const cfg);
