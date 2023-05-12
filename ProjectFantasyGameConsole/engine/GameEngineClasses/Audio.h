@@ -1,7 +1,4 @@
 #pragma once
-#ifndef AUDIO_H
-#define AUDIO_H
-
 #include <SDL.h>
 
 class Audio {
@@ -15,5 +12,3 @@ private:
     Uint8* wavBuffer;
     SDL_AudioDeviceID deviceId;
 };
-
-#endif //AUDIO_H
