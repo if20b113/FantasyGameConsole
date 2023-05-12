@@ -1,10 +1,2 @@
-# Dev manual (os:windows)
-
-## programming/dev
-to add new source files
--> run script "DEV_cmake_build.bat"
-    - the "build" dir has to be updated everytime a new .cpp file (to be compiled) is added.
-        this is done automatically by "DEV_cmake_build.bat"
-
-    - you DONT have to run the script when adding header files (.h / .hpp) ONLY source files
-
+doc / manual:
+https://docs.google.com/document/d/1s9jIbXq_07iu1N93oqrkPHaI_NjzL0jYg0-Sm2xSBc4/edit#heading=h.arx9yo6h0iuk
