@@ -1,19 +1,23 @@
 #pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
-#include <SDL.h>
+
+#include "core.h"
+
 #include "Vec.h"
 #include "GameObject.h"
 #include "Renderer.h"
-#include "WindowManager.h"
+#include "Window.h"
 
 namespace FGE
 {
-	typedef std::shared_ptr<GameObject> GameObjectPtr;
-	typedef std::unique_ptr<Window> WindowPtr;
-	typedef std::map<std::string, GameObjectPtr> ObjMap;
+    typedef std::shared_ptr<GameObject> GameObjectPtr;
+    typedef std::unique_ptr<Window> WindowPtr;
+    typedef std::map<std::string, GameObjectPtr> ObjMap;
+
 	class Engine
 	{
 	private:
@@ -52,3 +56,4 @@ namespace FGE
 
 
 }
+

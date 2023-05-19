@@ -1,7 +1,10 @@
 #pragma once
-#include <sdl.h>
-#include "ImageObject.h"
+
 #include <string>
+
+#include "SDL.h"
+
+#include "ImageObject.h"
 
 namespace FGE 
 {

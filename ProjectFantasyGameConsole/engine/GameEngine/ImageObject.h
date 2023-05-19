@@ -1,7 +1,9 @@
 #pragma once
-#include <sdl.h>
-#include <SDL_image.h>
 #include <string>
+
+#include "SDL.h"
+#include "SDL_image.h"
+
 #include "GameObject.h"
 
 class ImageObject : FGE::GameObject, Vec2D // Inherits protected and public GO/VEC2

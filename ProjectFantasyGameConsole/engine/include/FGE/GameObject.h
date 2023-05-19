@@ -1,7 +1,10 @@
 #pragma once
+
 #include <iostream>
 #include <vector>
+
 #include "Vec.h"
+
 constexpr int ENUM_RENDERABLE_START = 100;
 // Defines the minimum number of an enum that will be renderable by the SDL renderer (pictures, text...)
 // Why is this done? When a render function is called, the object needs to be renderable. 

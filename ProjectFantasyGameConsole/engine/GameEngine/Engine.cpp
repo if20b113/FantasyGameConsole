@@ -1,6 +1,10 @@
+#include <iostream>
+
+#include "_Window.h"
+
 #include "Engine.h"
 #include "GameObject.h"
-#include <iostream>
+
 namespace FGE
 {
 	Engine::Engine()
