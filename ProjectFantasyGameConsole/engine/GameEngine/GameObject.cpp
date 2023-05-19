@@ -3,7 +3,7 @@
 
 namespace FGE 
 {
-	GameObject::GameObject(ObjectType const objType)
+	GameObject::GameObject(ObjectType const objType) : m_IsActive{ false }
 	{
 		m_ObjType = objType;
 		m_Renderable = objType >= ENUM_RENDERABLE_START ? true : false; // If objecttype >= 100 then it's renderable

@@ -7,13 +7,13 @@ namespace FGE
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
-		m_Window = CreateEngineWindow();
+		m_Window = std::make_unique<Window>(Window());
 	}
 	Engine::Engine(WindowConfig const cfg)
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
-		m_Window = CreateEngineWindow(cfg);
+		m_Window = std::make_unique<Window>(Window(cfg));
 	}
 	Engine::~Engine()
 	{
@@ -35,14 +35,6 @@ namespace FGE
 	{
 		return m_Objects.find(objName) == m_Objects.end() ? true : false;
 	}
-	Window& Engine::CreateEngineWindow()
-	{
-		return Window(); // to be remade
-	}
-	Window& Engine::CreateEngineWindow(WindowConfig const cfg)
-	{
-		return Window(cfg);
-	}
 	void Engine::SetObjectActive(std::string const objName)
 	{
 		if (ObjectExists(objName))
@@ -57,7 +49,7 @@ namespace FGE
 			// Add log
 			return false;
 		}
-		m_Objects.emplace(objName, GameObjectPtr(eObjType));
+		m_Objects.emplace(objName, std::make_shared<GameObject>(eObjType));
 		if (ObjectExists(objName))
 		{
 			return true;

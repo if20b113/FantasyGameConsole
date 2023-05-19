@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include  <sdl.h> // Please, why is this not capitalized?
+#include <SDL.h>
 #include "Vec.h"
 #include "GameObject.h"
 #include "Renderer.h"
@@ -12,6 +12,7 @@
 namespace FGE
 {
 	typedef std::shared_ptr<GameObject> GameObjectPtr;
+	typedef std::unique_ptr<Window> WindowPtr;
 	typedef std::map<std::string, GameObjectPtr> ObjMap;
 	class Engine
 	{
@@ -24,15 +25,14 @@ namespace FGE
 		ObjMap m_Objects;
 		Vec2D m_Dimensions;
 		//EngineRenderer& m_Renderer;
-		Window m_Window;
+		WindowPtr m_Window; // Destroyed at end of Engine scope
 
 	private: // Object internal methods
 		bool ObjectExists(std::string const objName);
 		bool IsObjectActive(std::string const objName);
 
 	private: // Window Methods
-		Window& CreateEngineWindow();
-		Window& CreateEngineWindow(WindowConfig const cfg);
+
 
 	private: // Renderer Methods
 
