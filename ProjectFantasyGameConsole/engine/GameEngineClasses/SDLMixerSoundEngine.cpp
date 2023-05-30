@@ -3,10 +3,10 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-class Engine {
+class SoundEngine {
 public:
-    Engine();
-    ~Engine();
+    SoundEngine();
+    ~SoundEngine();
     void Initialize();
     void LoadSounds();
     void PlaySounds();
@@ -17,13 +17,13 @@ private:
     Mix_Music* music;
 };
 
-Engine::Engine() : soundEffect(nullptr), music(nullptr) {}
+SoundEngine::SoundEngine() : soundEffect(nullptr), music(nullptr) {}
 
-Engine::~Engine() {
+SoundEngine::~SoundEngine() {
     Shutdown();
 }
 
-void Engine::Initialize() {
+void SoundEngine::Initialize() {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_AUDIO) != 0) {
         throw std::runtime_error("Failed to initialize SDL: " + std::string(SDL_GetError()));
@@ -57,7 +57,7 @@ void Engine::Initialize() {
     }
 }
 
-void Engine::LoadSounds() {
+void SoundEngine::LoadSounds() {
     soundEffect = Mix_LoadWAV("sound.wav");
     if (soundEffect == nullptr) {
         throw std::runtime_error("Failed to load sound effect: " + std::string(Mix_GetError()));
@@ -71,7 +71,7 @@ void Engine::LoadSounds() {
     printf("Music loaded\n");
 }
 
-void Engine::PlaySounds() {
+void SoundEngine::PlaySounds() {
     //Mix_VolumeMusic(64); // Adjust the volume as desired (0-128)
     // Play sound effect
     Mix_PlayChannel(-1, soundEffect, -1);
@@ -80,7 +80,7 @@ void Engine::PlaySounds() {
     SDL_Delay(5000);
 }
 
-void Engine::Shutdown() {
+void SoundEngine::Shutdown() {
     Mix_FreeChunk(soundEffect);
     Mix_FreeMusic(music);
     Mix_CloseAudio();
