@@ -9,7 +9,7 @@ add_library(FantasyGameEngine SHARED ${ENGINE_SOURCE_FILES})
 
 target_link_libraries(FantasyGameEngine PRIVATE external_deps)
 target_include_directories(FantasyGameEngine 
-    PRIVATE include/FGE GameEngine GameEngineClasses
+    PUBLIC include/FGE GameEngine GameEngineClasses
     PUBLIC include)
 
 target_compile_features(FantasyGameEngine PRIVATE cxx_std_17)
