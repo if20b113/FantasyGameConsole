@@ -1,10 +1,10 @@
 #pragma once
 #include <SDL_mixer.h>
 
-class Engine {
+class SoundEngine {
 public:
-    Engine();
-    ~Engine();
+    SoundEngine();
+    ~SoundEngine();
     void Initialize();
     void LoadSounds();
     void PlaySounds();
