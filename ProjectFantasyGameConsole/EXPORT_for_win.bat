@@ -5,3 +5,4 @@ copy build\engine\Debug\FantasyGameEngine.dll %TARGET%
 copy external_deps\sdl2\SDL2.dll %TARGET%
 copy external_deps\sdl2_ttf\SDL2_ttf.dll %TARGET%
 copy external_deps\sdl2_image\SDL2_image.dll %TARGET%
+copy external_deps\SDL2_mixer-2.6.3\SDL2_mixer.dll %TARGET%
