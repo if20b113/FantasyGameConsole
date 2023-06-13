@@ -10,13 +10,13 @@ namespace FGE
 	Engine::Engine() : m_EngineActive{true}, m_SdlInitialized{ true }
 	{
 		// Do Setup
-		std::cout << "Hello from Engine" << std::endl;
+		std::cout << "FL: " << __FL__ << " (" << __FUNCTION_NAME__ << "): Hello from Engine" << std::endl;
 		m_Renderer = std::make_unique<EngineRenderer>(EngineRenderer());
 	}
 	Engine::Engine(WindowConfig cfg) : m_EngineActive{ true }, m_SdlInitialized{ true }
 	{
 		// Do Setup
-		std::cout << "Hello from Engine" << std::endl;
+		std::cout << "FL: " << __FL__ << " (" << __FUNCTION_NAME__ << "): Hello from Engine" << std::endl;
 		m_Renderer = std::make_unique<EngineRenderer>(EngineRenderer(cfg));
 
 	}

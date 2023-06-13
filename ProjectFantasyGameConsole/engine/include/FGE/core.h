@@ -2,8 +2,11 @@
 
 #ifdef _WIN32
 #  define FGE_API __declspec(dllexport)
+#  define __FUNCTION_NAME__   __FUNCTION__  
+#  define __FL__   __LINE__
 #else
-#  define FGE_API
+#   define FGE_API
+#   define __FUNCTION_NAME__   __func__ 
 #endif
 
 #include <cstdint>
