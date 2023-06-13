@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <iostream>
-
+#include <memory>
 #include "FGE/Engine.h"
 
 int main()
 {
-	FGE::Engine eng;
+	FGE::Engine engine;
 	system("pause");
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SDL.h"
-
 #include "Window.h"
 
 namespace FGE
@@ -12,9 +11,9 @@ namespace FGE
 		SDL_Window* m_window;
 		WindowConfig m_cfg;
         void parse_flags();
-		//bool CreateWindow();
 	public:
 		Window(); // Using default configuration
-		Window(WindowConfig const cfg);
+		Window(WindowConfig cfg);
+		SDL_Window* GetWindow(); // Warning, return of exposed pointer
 	};
 }

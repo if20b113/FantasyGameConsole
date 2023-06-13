@@ -1,27 +1,45 @@
-#include "ImageObject.h"
+#include "_ImageObject.h"
+#include "GameObject.h"
 
-ImageObject::ImageObject(SDL_Texture* texture)
+namespace FGE 
 {
-    tex = texture;
-}
 
-void ImageObject::loadImage(SDL_Texture* texture) {
+    ImageObject::ImageObject()
+    {
+        m_ObjType = IMAGE;
+        m_Tex = nullptr;
+        m_IsLoaded = false;
+    }
+    ImageObject::ImageObject(SDL_Texture* texture)
+    {
+        m_ObjType = IMAGE;
+        m_Tex = texture;
+        m_IsLoaded = true;
+    }
 
-   //renderer = ren;
+    void ImageObject::ChangeTexture(SDL_Texture* texture) 
+    {
+        m_Tex = texture;
+        m_IsLoaded = false;
+    }
 
-   // static SDL_Texture* t = IMG_LoadTexture(renderer, image_path.c_str());
-    tex = texture;
-}
+    void ImageObject::UnloadTexture()
+    {
+        // Should I be doing this?
+        m_Tex = nullptr;
+    }
 
-void ImageObject::updateImgProperties(int ImageWidth, int ImageHeight, int ImgPosx, int ImgPosy, int ImageSizeWidth, int ImageSizeHeight) {
+    bool ImageObject::IsLoaded()
+    {
+        return m_IsLoaded;
+    }
 
-    srect.h = ImageHeight;
-    srect.w = ImageWidth;
-    srect.x = 0;
+    SDL_Texture* ImageObject::GetTexture()
+    {
+        return m_Tex;
+    }
 
-    drect.h = ImageSizeHeight;
-    drect.w = ImageSizeWidth;
-    drect.x = ImgPosx;
-    drect.y = ImgPosy;
+
+
 }
 

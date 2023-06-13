@@ -1,7 +1,5 @@
 #include <iostream>
-
 #include "SDL.h"
-
 #include "_Window.h"
 
 namespace FGE
@@ -24,7 +22,7 @@ namespace FGE
 		// SDl log e.what()
 	}
 
-	Window::Window(WindowConfig const cfg) : m_cfg(cfg) // override base config
+	Window::Window(WindowConfig cfg) : m_cfg(cfg) // override base config
 	{
 		parse_flags();
 
@@ -33,5 +31,13 @@ namespace FGE
 		// SDl log e.what()
 		//exit();
 		
+	}
+	SDL_Window* Window::GetWindow()
+	{
+		if (m_window)
+		{
+			return m_window;
+		}
+		return nullptr;
 	}
 }

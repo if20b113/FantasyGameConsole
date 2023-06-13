@@ -1,23 +1,25 @@
 #include <iostream>
 
-#include "_Window.h"
-
+#include "_Window.h" // Private headers
+#include "_Renderer.h"
+#include "_GameObject.h"
+#include "_ImageObject.h"
 #include "Engine.h"
-#include "GameObject.h"
 
 namespace FGE
 {
-	Engine::Engine()
+	Engine::Engine() : m_EngineActive{true}, m_SdlInitialized{ true }
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
-		m_Window = std::make_unique<Window>(Window());
+		m_Renderer = std::make_unique<EngineRenderer>(EngineRenderer());
 	}
-	Engine::Engine(WindowConfig const cfg)
+	Engine::Engine(WindowConfig cfg) : m_EngineActive{ true }, m_SdlInitialized{ true }
 	{
 		// Do Setup
 		std::cout << "Hello from Engine" << std::endl;
-		m_Window = std::make_unique<Window>(Window(cfg));
+		m_Renderer = std::make_unique<EngineRenderer>(EngineRenderer(cfg));
+
 	}
 	Engine::~Engine()
 	{
@@ -31,29 +33,71 @@ namespace FGE
 			auto scnd = find->second;
 			if (scnd->Renderable() && scnd->Active())
 			{
-				// Do render or whatever
+				ObjectType type = scnd->Type();
+				switch (type)
+				{
+					case IMAGE:
+					{
+						if (m_Renderer->RenderObject(dynamic_cast<ImageObject*>(scnd.get())))
+						{
+							// Rendered object successfully.
+							std::cout << "Rendered object successfully.\n";
+						}
+						break;
+					}
+					default:
+					{
+						// Log: not supported yet
+						break;
+					}
+				}
+				
 			}
+			// Log: object name x is either not renderable or inactive.
+			std::cout << "object is either not renderable or inactive..\n";
 		}
+		// Log: object not found
 	}
 	bool Engine::ObjectExists(std::string const objName)
 	{
 		return m_Objects.find(objName) == m_Objects.end() ? true : false;
 	}
+	GameObjectPtr Engine::GetObject(std::string const objName)
+	{
+		auto obj = m_Objects.find(objName);
+		return obj->second;
+	}
 	void Engine::SetObjectActive(std::string const objName)
 	{
 		if (ObjectExists(objName))
 		{
-			SetObjectActive(objName);
+			GameObjectPtr obj = GetObject(objName);
 		}
 	}
-	bool FGE::Engine::CreateObject(ObjectType const eObjType, std::string const objName, int const x, int const y)
+	bool Engine::CreateObject(ObjectType const eObjType, std::string const objName, int const x, int const y)
 	{
 		if(ObjectExists(objName))
 		{
 			// Add log
 			return false;
 		}
-		m_Objects.emplace(objName, std::make_shared<GameObject>(eObjType));
+
+		// Make object based on type
+		switch (eObjType)
+		{
+			case IMAGE:
+			{
+				ImageObject imgObj;
+
+				m_Objects.emplace(objName, std::make_shared<GameObject>(imgObj));
+				break;
+			}
+			default:
+			{
+				// Log: not supported yet
+				return false;
+			}
+		}
 		if (ObjectExists(objName))
 		{
 			return true;
