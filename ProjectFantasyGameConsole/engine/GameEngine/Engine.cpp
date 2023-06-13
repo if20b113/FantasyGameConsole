@@ -59,7 +59,7 @@ namespace FGE
 	}
 	bool Engine::ObjectExists(std::string const objName)
 	{
-		return m_Objects.find(objName) == m_Objects.end() ? true : false;
+		return m_Objects.find(objName) == m_Objects.end() ? false : true;
 	}
 	GameObjectPtr Engine::GetObject(std::string const objName)
 	{
@@ -78,6 +78,7 @@ namespace FGE
 		if(ObjectExists(objName))
 		{
 			// Add log
+
 			return false;
 		}
 
@@ -97,12 +98,15 @@ namespace FGE
 				return false;
 			}
 		}
-		if (ObjectExists(objName))
+
+		if (!ObjectExists(objName))
 		{
-			return true;
+			// Add log
+			return false;
 		}
-		// Add log
-		return false;
+		
+		std::cout << "object created\n";
+		return true;
 	}
 	
 	bool Engine::AttachTextureToObj(std::string const objName, std::string const RscPath)
@@ -110,6 +114,7 @@ namespace FGE
 		if (!ObjectExists(objName))
 		{
 			// Add log
+			std::cout << "object does not exist\n";
 			return false;
 		}
 
@@ -120,13 +125,26 @@ namespace FGE
 
 			case IMAGE:
 			{
-				if (m_Renderer->LoadTexture(dynamic_cast<ImageObject*>(obj.get()), RscPath))
+				auto imgPtr = (ImageObject*)(obj.get());
+				
+				printf("imgptr:%d\n", (long long)imgPtr);
+
+				if (!imgPtr)
 				{
-					// Log: Success
-					return true;
+					std::cout << "failed to load image. imgPtr is null\n";
+					return false;
 				}
-				// Add error
-				return false;
+
+				if (!m_Renderer->LoadTexture(imgPtr, RscPath))
+				{
+					// Add error
+					std::cout << "failed to load image\n";
+					return false;
+				}
+				
+				// Log: Success
+				std::cout << "image loaded\n";
+				return true;
 			}
 			default:
 			{
