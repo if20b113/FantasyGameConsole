@@ -39,14 +39,16 @@ namespace FGE
 	public:  // Renderer Methods
 		void RenderObject(std::string const objName);
 	public:
-
+		// Instantiation
 		Engine();
 		Engine(WindowConfig cfg);
 		virtual ~Engine();
-		
+	public:
+		// Object handling
 		void SetObjectActive(std::string const objName);
 		bool CreateObject(ObjectType const eObjType, std::string const objName, int const x = 0, int const y = 0);
-
+		bool AttachTextureToObj(std::string const objName, std::string const RscPath);
+	public:
 		// Handle events
 		bool OnEvent(); // Switch statement location xy(z). Check collision with objects. Check bound events. Do overloaded events
 		//If then trigger Events from Object class

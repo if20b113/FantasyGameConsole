@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include "_Window.h" // Private headers
 #include "_Renderer.h"
 #include "_GameObject.h"
@@ -106,5 +105,39 @@ namespace FGE
 		return false;
 	}
 	
+	bool Engine::AttachTextureToObj(std::string const objName, std::string const RscPath)
+	{
+		if (!ObjectExists(objName))
+		{
+			// Add log
+			return false;
+		}
 
+		// To do: Check path validity
+		GameObjectPtr obj = GetObject(objName);
+		switch (obj->Type())
+		{
+
+			case IMAGE:
+			{
+				if (m_Renderer->LoadTexture(dynamic_cast<ImageObject*>(obj.get()), RscPath))
+				{
+					// Log: Success
+					return true;
+				}
+				// Add error
+				return false;
+			}
+			default:
+			{
+				// Log anything
+				return false;
+				break;
+			}
+			
+		}
+		return false;
+	}
 }
+
+
