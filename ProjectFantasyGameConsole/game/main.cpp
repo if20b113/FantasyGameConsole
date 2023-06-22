@@ -8,9 +8,27 @@
 #include "FantasyGameEngine/ScoreManagement.hpp"
 #include "FantasyGameEngine/JobManagement.hpp"
 
+int async_add(int a, int b)
+{
+	return a + b;
+}
+
 int main()
 {
-	puts("TESTING LUA...");
+	puts("TESTING BasicThreadPool ...");
+
+	FantasyGameEngine::BasicThreadPool btp(5);
+
+	auto work_result_1 = btp.enqueue(async_add, 4, 7);
+	auto work_result_2 = btp.enqueue(async_add, 123, 12);
+
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+
+	printf("work result: %d, %d\n", 
+		work_result_1.get(), 
+		work_result_2.get());
+
+	puts("\nTESTING LUA...");
 	FantasyGameEngine::test_lua();
 	
 	puts("\nTESTING SDL...");
