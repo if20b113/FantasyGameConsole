@@ -9,7 +9,7 @@
 
 namespace FantasyGameEngine {
 
-	FGE_API void test_sdl();
+	FGE_API int test_sdl();
 	FGE_API void test_lua();
 	FGE_API int add(int a, int b);
 

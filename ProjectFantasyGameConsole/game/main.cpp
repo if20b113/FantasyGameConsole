@@ -10,9 +10,14 @@
 
 int main()
 {
+	puts("TESTING LUA...");
 	FantasyGameEngine::test_lua();
-	FantasyGameEngine::test_sdl();
+	
+	puts("\nTESTING SDL...");
+	printf("SDL TESTING RETURNED %d\n", 
+		FantasyGameEngine::test_sdl());
 
+	puts("\nTESTING FS...");
 	puts("reading file ...");
 	auto test_file = FantasyGameEngine::read_text_from_file("assets/scripts/test.lua");
 	std::cout << test_file << std::endl;
