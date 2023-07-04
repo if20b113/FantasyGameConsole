@@ -10,9 +10,6 @@
 namespace FGE 
 {
 
-	// Notice this is some privisionary architecture. The structure will be vastly different from implementation
-	// Once I have a bigger idea
-
 	typedef std::vector<Event> EventVec;
 	class Event
 	{
@@ -21,9 +18,6 @@ namespace FGE
 	public:
 		Event(EventType eEventType) { m_EventType = eEventType; };
 	};
-
-	// This class should probably not be the actual object. It should be what different types of object inherit from.
-	// So in reality we should have for example a renderable object (like a picture) that inherits from GameObject
 
 	class GameObject: public Vec2D // Vec2D introduces SDL rects
 	{
