@@ -18,7 +18,8 @@ namespace FantasyGameEngine
         ~BasicThreadPool();
 
         template<typename Func, typename... Args>
-        auto enqueue(Func&& func, Args&&... args) -> std::future<typename std::result_of<Func(Args...)>::type>
+        auto enqueue(Func&& func, Args&&... args) 
+            -> std::future<typename std::result_of<Func(Args...)>::type>
         {
             using ReturnType = typename std::result_of<Func(Args...)>::type;
 
