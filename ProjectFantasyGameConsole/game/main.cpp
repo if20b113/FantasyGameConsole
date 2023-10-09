@@ -8,12 +8,39 @@
 #include "FantasyGameEngine/ScoreManagement.hpp"
 #include "FantasyGameEngine/JobManagement.hpp"
 
-int async_add(int a, int b)
+using namespace FantasyGameEngine;
+
+float x_offset = 0;
+
+void update(const FGE_Renderer* renderer, const FGE_Inputs *inputs)
 {
-	return a + b;
+	if (inputs->pressed & FGEKC_a) x_offset -= 10.0f;
+	if (inputs->pressed & FGEKC_d) x_offset += 10.0f;
+
+	for (int i = 0; i < 10; i++)
+	{
+		FantasyGameEngine::render_rect(renderer, 
+			10 + x_offset, 10 + i * 40, 
+			30, 30, 
+			1, 0, 1);
+	}
+
 }
 
 int main()
+{
+	FantasyGameEngine::run(update);
+
+	return 0;
+}
+
+/*
+* 
+* int async_add(int a, int b)
+{
+	return a + b;
+}
+int run_engine_tests()
 {
 	puts("TESTING BasicThreadPool ...");
 
@@ -64,4 +91,7 @@ int main()
 			std::get<2>(e).c_str());
 
 	FantasyGameEngine::write_text_to_file("test.txt", test_file);
+
+	return 0;
 }
+*/
