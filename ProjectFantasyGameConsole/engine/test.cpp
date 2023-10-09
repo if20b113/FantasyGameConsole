@@ -14,22 +14,10 @@
 #include "lua.hpp"
 #include "sol/sol.hpp"
 
-#include "FantasyGameEngine.hpp"
+#include "_FantasyGameEngine.hpp"
 
 namespace FantasyGameEngine 
 {
-    struct FGE_Renderer
-    {
-        SDL_Renderer* sdl_renderer;
-    };
-
-    void render_rect(const FGE_Renderer* renderer, float x, float y, float w, float h, float r, float g, float b)
-    {
-        SDL_Rect rect = { x,y,w,h };
-        SDL_SetRenderDrawColor(renderer->sdl_renderer, r * 255, g * 255, b * 255, 255);
-        SDL_RenderFillRect(renderer->sdl_renderer, &rect);
-    }
-
     void render_imgui_windows(ImGuiIO& io, bool& show_demo_window, bool& show_another_window, ImVec4& clear_color)
     {
         static float f = 0.0f;
@@ -62,101 +50,6 @@ namespace FantasyGameEngine
                 show_another_window = false;
             ImGui::End();
         }
-    }
-
-    void run(FGE_Update update_func)
-    {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0)
-        {
-            fprintf(stderr, "failed to initialize sdl2: %s\n", SDL_GetError());
-            return;
-        }
-
-        const int window_width = 1280;
-        const int window_height = 720;
-
-        SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-
-        SDL_Window* window = SDL_CreateWindow(
-            "SDL Test",
-            SDL_WINDOWPOS_CENTERED,
-            SDL_WINDOWPOS_CENTERED,
-            window_width,
-            window_height,
-            window_flags);
-
-        if (window == NULL)
-        {
-            fprintf(stderr, "failed to create window: %s\n", SDL_GetError());
-            return;
-        }
-
-        SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-
-        if (renderer == NULL)
-        {
-            fprintf(stderr, "failed to create renderer: %s\n", SDL_GetError());
-            return;
-        }
-
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-        FGE_Inputs inputs;
-
-        bool running = true;
-        while (running)
-        {
-            inputs = {};
-
-            SDL_Event event;
-            while (SDL_PollEvent(&event))
-            {
-                if (event.type == SDL_WINDOWEVENT && 
-                    event.window.event == SDL_WINDOWEVENT_CLOSE && 
-                    event.window.windowID == SDL_GetWindowID(window))
-                    running = false;
-
-                switch (event.type) 
-                {
-                case SDL_QUIT:
-                    running = false;
-                    break;
-
-                case SDL_KEYDOWN:
-                    switch (event.key.keysym.sym)
-                    {
-                    case SDLK_w: inputs.pressed |= FGEKC_w; break;
-                    case SDLK_a: inputs.pressed |= FGEKC_a; break;
-                    case SDLK_s: inputs.pressed |= FGEKC_s; break;
-                    case SDLK_d: inputs.pressed |= FGEKC_d; break;
-                    }
-                    break;
-
-                case SDL_KEYUP:
-
-                    break;
-
-                default:
-                    break;
-                }
-            }
-
-            SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-
-            SDL_RenderClear(renderer);
-
-            FGE_Renderer r;
-            r.sdl_renderer = renderer;
-            update_func(&r, &inputs);
-
-            SDL_RenderPresent(renderer);
-        }
-
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-
-        return;
     }
 
     int test_sdl()

@@ -57,4 +57,4 @@ target_link_libraries(sol2 INTERFACE lua)
 target_include_directories(sol2 INTERFACE sol2/include)
 
 add_library(external_deps INTERFACE)
-target_link_libraries(external_deps INTERFACE sdl2 sdl2_ttf imgui rmlui_sdl sqlite3 sol2)
+target_link_libraries(external_deps INTERFACE sdl2 sdl2_ttf sdl2_image imgui sqlite3 sol2)

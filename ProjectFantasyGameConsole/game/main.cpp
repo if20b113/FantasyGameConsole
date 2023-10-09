@@ -10,21 +10,38 @@
 
 using namespace FantasyGameEngine;
 
-float x_offset = 0;
+struct GameState {
+	bool started = false;
+	float x_offset = 0;
+	FGE_ImageHandle img;
+} game_state;
 
-void update(const FGE_Renderer* renderer, const FGE_Inputs *inputs)
+void update(
+	const FGE_Renderer* renderer, 
+	const FGE_Inputs* inputs,
+	double delta)
 {
-	if (inputs->pressed & FGEKC_a) x_offset -= 10.0f;
-	if (inputs->pressed & FGEKC_d) x_offset += 10.0f;
+	if (!game_state.started)
+	{
+		game_state.img = load_image(renderer, "assets/button.png");
+		game_state.started = true;
+	}
+
+	if (inputs->down & FGEKC_a) game_state.x_offset -= 1.0f;
+	if (inputs->down & FGEKC_d) game_state.x_offset += 1.0f;
+
+	auto text = std::to_string(delta);
+
+	render_text(renderer, 5, 5, text.c_str());
+	render_image(renderer, 50, 50, &game_state.img);
 
 	for (int i = 0; i < 10; i++)
 	{
 		FantasyGameEngine::render_rect(renderer, 
-			10 + x_offset, 10 + i * 40, 
+			10 + game_state.x_offset, 10 + i * 40,
 			30, 30, 
 			1, 0, 1);
 	}
-
 }
 
 int main()

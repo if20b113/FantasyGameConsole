@@ -17,17 +17,23 @@ namespace FantasyGameEngine {
 	const u32 FGEKC_d = 0b1000;
 
 	struct FGE_Renderer;
+	typedef u32 FGE_ImageHandle;
 	struct FGE_Inputs
 	{
 		u32 down;
 		u32 pressed;
 	};
 
-	typedef void FGE_Update(const FGE_Renderer* renderer, const FGE_Inputs* inputs);
+	typedef void FGE_Update(
+		const FGE_Renderer* renderer, 
+		const FGE_Inputs* inputs,
+		double delta);
 
+	FGE_API FGE_ImageHandle load_image(const FGE_Renderer* renderer, const char* path);
 	FGE_API void render_rect(const FGE_Renderer* renderer, float x, float y, float w, float h, float r, float g, float b);
+	FGE_API void render_image(const FGE_Renderer* renderer, float x, float y, const FGE_ImageHandle* image);
+	FGE_API void render_text(const FGE_Renderer* renderer, float x, float y, const char* text);
 	FGE_API void run(FGE_Update update_func);
-
 
 	FGE_API int test_sdl();
 	FGE_API void test_lua();
