@@ -22,7 +22,11 @@ namespace FantasyGameEngine
         printf("sdl error (%s): %s\n", note, err_msg_buf);
     }
 
-    void run(FGE_Update update_func)
+    void run(
+        FGE_Init init_func,
+        FGE_Update update_func,
+        FGE_Render render_func,
+        double tick_length_ms)
     {
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
@@ -57,6 +61,8 @@ namespace FantasyGameEngine
             return;
         }
 
+        SDL_GL_SetSwapInterval(0);
+
         TTF_Init();
         fge_state.font = TTF_OpenFont("assets/tahoma.ttf", 32);
         print_sdl_error("after TTF_OpenFont");
@@ -65,8 +71,15 @@ namespace FantasyGameEngine
 
         FGE_Inputs inputs = {};
 
+        FGE_Renderer r;
+        r.sdl_renderer = renderer;
+
         Uint64 timestamp_now = SDL_GetPerformanceCounter();
         Uint64 timestamp_last = 0;
+
+        double tick_timer = 0;
+
+        init_func(&r);
 
         bool running = true;
         while (running)
@@ -120,9 +133,6 @@ namespace FantasyGameEngine
 
             SDL_RenderClear(renderer);
 
-            FGE_Renderer r;
-            r.sdl_renderer = renderer;
-
             timestamp_last = timestamp_now;
             timestamp_now = SDL_GetPerformanceCounter();
             double delta = (double)
@@ -132,7 +142,15 @@ namespace FantasyGameEngine
                 / (double)SDL_GetPerformanceFrequency()
             );
 
-            update_func(&r, &inputs, delta);
+            tick_timer += delta;
+
+            while (tick_timer > tick_length_ms)
+            {
+                update_func(&inputs);
+                tick_timer -= tick_length_ms;
+            }
+
+            render_func(&r, delta);
 
             SDL_RenderPresent(renderer);
         }

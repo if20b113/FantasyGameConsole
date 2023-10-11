@@ -12,38 +12,38 @@ using namespace FantasyGameEngine;
 
 struct GameState {
 	bool started = false;
-	float x_offset = 0;
 	FGE_ImageHandle img;
+	std::vector<glm::vec2> block_pos;
 } game_state;
 
-void update(
-	const FGE_Renderer* renderer, 
-	const FGE_Inputs* inputs,
-	double delta)
+void init(const FGE_Renderer* renderer)
 {
-	if (!game_state.started)
-	{
-		game_state.img = load_image(renderer, "assets/button.png");
-		game_state.started = true;
-	}
-
-	if (inputs->down & FGEKC_a) game_state.x_offset -= 1.0f;
-	if (inputs->down & FGEKC_d) game_state.x_offset += 1.0f;
-
-	auto text = std::to_string(delta);
-
-	render_text(renderer, { 5, 5 }, text.c_str());
-	render_image(renderer, { 50, 50 }, game_state.img);
+	game_state.img = load_image(renderer, "assets/button.png");
 
 	for (int i = 0; i < 10; i++)
 	{
-		FantasyGameEngine::render_rect(renderer, 
-			{ 10 + game_state.x_offset, 10 + i * 40 },
-			{ 30, 30 },
-			1, 0, 1);
+		game_state.block_pos.push_back({ 30 + i * 100, 30 + i * 10 });
+	}
+}
 
+void update(const FGE_Inputs* inputs)
+{
+	for (auto& pos : game_state.block_pos)
+	{
+		pos += glm::vec2(0, 10);
+	}
+}
+
+void render(const FGE_Renderer* renderer, double delta)
+{
+	auto text = std::to_string(delta);
+
+	render_text(renderer, { 5, 5 }, text.c_str());
+
+	for (const auto& pos : game_state.block_pos)
+	{
 		FantasyGameEngine::render_image(renderer,
-			{ 40 + game_state.x_offset, 10 + i * 40 },
+			pos,
 			{ 50, 50 },
 			game_state.img);
 	}
@@ -51,7 +51,7 @@ void update(
 
 int main()
 {
-	FantasyGameEngine::run(update);
+	FantasyGameEngine::run(init, update, render, 0.5f * 1000);
 
 	return 0;
 }

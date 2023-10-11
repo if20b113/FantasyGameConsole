@@ -26,9 +26,14 @@ namespace FantasyGameEngine {
 		u32 pressed;
 	};
 
+	typedef void FGE_Init(
+		const FGE_Renderer* renderer);
+
 	typedef void FGE_Update(
-		const FGE_Renderer* renderer, 
-		const FGE_Inputs* inputs,
+		const FGE_Inputs* inputs);
+
+	typedef void FGE_Render(
+		const FGE_Renderer* renderer,
 		double delta);
 
 	FGE_API FGE_ImageHandle load_image(const FGE_Renderer* renderer, const char* path);
@@ -36,7 +41,11 @@ namespace FantasyGameEngine {
 	FGE_API void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const FGE_ImageHandle& image);
 	FGE_API void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const glm::vec2& size, const FGE_ImageHandle& image);
 	FGE_API void render_text (const FGE_Renderer* renderer, const glm::vec2& pos, const char* text);
-	FGE_API void run(FGE_Update update_func);
+	FGE_API void run(
+		FGE_Init init_func,
+		FGE_Update update_func, 
+		FGE_Render render_func, 
+		double tick_length_ms);
 
 	FGE_API int test_sdl();
 	FGE_API void test_lua();
