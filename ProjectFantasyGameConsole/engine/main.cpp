@@ -23,9 +23,9 @@ namespace FantasyGameEngine
     }
 
     void run(
-        FGE_Init init_func,
-        FGE_Update update_func,
-        FGE_Render render_func,
+        FGE_InitFunc init_func,
+        FGE_UpdateFunc update_func,
+        FGE_RenderFunc render_func,
         double tick_length_ms)
     {
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -146,7 +146,7 @@ namespace FantasyGameEngine
 
             while (tick_timer > tick_length_ms)
             {
-                update_func(&inputs);
+                update_func(inputs);
                 tick_timer -= tick_length_ms;
             }
 

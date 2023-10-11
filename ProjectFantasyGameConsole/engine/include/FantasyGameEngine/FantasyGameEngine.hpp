@@ -26,13 +26,13 @@ namespace FantasyGameEngine {
 		u32 pressed;
 	};
 
-	typedef void FGE_Init(
+	typedef void FGE_InitFunc(
 		const FGE_Renderer* renderer);
 
-	typedef void FGE_Update(
-		const FGE_Inputs* inputs);
+	typedef void FGE_UpdateFunc(
+		const FGE_Inputs& inputs);
 
-	typedef void FGE_Render(
+	typedef void FGE_RenderFunc(
 		const FGE_Renderer* renderer,
 		double delta);
 
@@ -42,9 +42,9 @@ namespace FantasyGameEngine {
 	FGE_API void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const glm::vec2& size, const FGE_ImageHandle& image);
 	FGE_API void render_text (const FGE_Renderer* renderer, const glm::vec2& pos, const char* text);
 	FGE_API void run(
-		FGE_Init init_func,
-		FGE_Update update_func, 
-		FGE_Render render_func, 
+		FGE_InitFunc init_func,
+		FGE_UpdateFunc update_func, 
+		FGE_RenderFunc render_func, 
 		double tick_length_ms);
 
 	FGE_API int test_sdl();

@@ -14,6 +14,7 @@ struct GameState {
 	bool started = false;
 	FGE_ImageHandle img;
 	std::vector<glm::vec2> block_pos;
+	float char_pos = 500;
 } game_state;
 
 void init(const FGE_Renderer* renderer)
@@ -26,8 +27,11 @@ void init(const FGE_Renderer* renderer)
 	}
 }
 
-void update(const FGE_Inputs* inputs)
+void update(const FGE_Inputs& inputs)
 {
+	if (inputs.down & FGEKC_a) game_state.char_pos -= 40;
+	if (inputs.down & FGEKC_d) game_state.char_pos += 40;
+
 	for (auto& pos : game_state.block_pos)
 	{
 		pos += glm::vec2(0, 10);
@@ -40,6 +44,8 @@ void render(const FGE_Renderer* renderer, double delta)
 
 	render_text(renderer, { 5, 5 }, text.c_str());
 
+	render_rect(renderer, { game_state.char_pos, 600 }, { 70, 70 }, 1, 0, 0);
+
 	for (const auto& pos : game_state.block_pos)
 	{
 		FantasyGameEngine::render_image(renderer,
@@ -51,7 +57,7 @@ void render(const FGE_Renderer* renderer, double delta)
 
 int main()
 {
-	FantasyGameEngine::run(init, update, render, 0.5f * 1000);
+	FantasyGameEngine::run(init, update, render, 0.25f * 1000);
 
 	return 0;
 }
