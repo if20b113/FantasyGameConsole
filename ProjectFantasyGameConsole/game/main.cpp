@@ -32,15 +32,20 @@ void update(
 
 	auto text = std::to_string(delta);
 
-	render_text(renderer, 5, 5, text.c_str());
-	render_image(renderer, 50, 50, &game_state.img);
+	render_text(renderer, { 5, 5 }, text.c_str());
+	render_image(renderer, { 50, 50 }, game_state.img);
 
 	for (int i = 0; i < 10; i++)
 	{
 		FantasyGameEngine::render_rect(renderer, 
-			10 + game_state.x_offset, 10 + i * 40,
-			30, 30, 
+			{ 10 + game_state.x_offset, 10 + i * 40 },
+			{ 30, 30 },
 			1, 0, 1);
+
+		FantasyGameEngine::render_image(renderer,
+			{ 40 + game_state.x_offset, 10 + i * 40 },
+			{ 50, 50 },
+			game_state.img);
 	}
 }
 

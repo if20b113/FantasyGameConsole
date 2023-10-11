@@ -1,6 +1,8 @@
 #ifndef FANTASYGAMEENGINE_HPP
 #define FANTASYGAMEENGINE_HPP
 
+#include "glm/vec2.hpp"
+
 #ifdef _WIN32
 #  define FGE_API __declspec(dllexport)
 #else
@@ -30,9 +32,10 @@ namespace FantasyGameEngine {
 		double delta);
 
 	FGE_API FGE_ImageHandle load_image(const FGE_Renderer* renderer, const char* path);
-	FGE_API void render_rect(const FGE_Renderer* renderer, float x, float y, float w, float h, float r, float g, float b);
-	FGE_API void render_image(const FGE_Renderer* renderer, float x, float y, const FGE_ImageHandle* image);
-	FGE_API void render_text(const FGE_Renderer* renderer, float x, float y, const char* text);
+	FGE_API void render_rect (const FGE_Renderer* renderer, const glm::vec2& pos, const glm::vec2& size, float r, float g, float b);
+	FGE_API void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const FGE_ImageHandle& image);
+	FGE_API void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const glm::vec2& size, const FGE_ImageHandle& image);
+	FGE_API void render_text (const FGE_Renderer* renderer, const glm::vec2& pos, const char* text);
 	FGE_API void run(FGE_Update update_func);
 
 	FGE_API int test_sdl();

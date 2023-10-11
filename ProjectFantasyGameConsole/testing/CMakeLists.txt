@@ -4,5 +4,5 @@ project(FantasyGameConsoleProject)
 include(googletest)
 
 add_executable(TestExe test.cpp)
-target_link_libraries(TestExe PRIVATE gtest_main FantasyGameEngine)
+target_link_libraries(TestExe PRIVATE gtest_main FantasyGameEngine glm)
 gtest_discover_tests(TestExe WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/export")

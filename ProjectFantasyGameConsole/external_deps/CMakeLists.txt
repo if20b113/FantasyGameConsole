@@ -43,6 +43,7 @@ add_subdirectory(sqlite-amalgamation-3400000)
 add_subdirectory(lua)
 add_subdirectory(imgui-1.89.5)
 add_subdirectory(RmlUi-5.1)
+add_subdirectory(glm)
 
 add_library(rmlui_sdl STATIC 
     "${CMAKE_SOURCE_DIR}/external_deps/RmlUi-5.1/Backends/RmlUi_Platform_SDL.cpp"
@@ -57,4 +58,4 @@ target_link_libraries(sol2 INTERFACE lua)
 target_include_directories(sol2 INTERFACE sol2/include)
 
 add_library(external_deps INTERFACE)
-target_link_libraries(external_deps INTERFACE sdl2 sdl2_ttf sdl2_image imgui sqlite3 sol2)
+target_link_libraries(external_deps INTERFACE sdl2 sdl2_ttf sdl2_image imgui sqlite3 sol2 glm)

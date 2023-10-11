@@ -15,9 +15,17 @@
 
 namespace FantasyGameEngine
 {
-    void render_rect(const FGE_Renderer* renderer, float x, float y, float w, float h, float r, float g, float b)
+    void render_rect(const FGE_Renderer* renderer, 
+        const glm::vec2& pos, 
+        const glm::vec2& size, 
+        float r, float g, float b)
     {
-        SDL_Rect rect = { x,y,w,h };
+        SDL_Rect rect = { 
+            pos.x,
+            pos.y,
+            size.x,
+            size.y 
+        };
         SDL_SetRenderDrawColor(renderer->sdl_renderer, r * 255, g * 255, b * 255, 255);
         SDL_RenderFillRect(renderer->sdl_renderer, &rect);
     }
@@ -32,26 +40,42 @@ namespace FantasyGameEngine
         return this_image_handle;
     }
 
-    void render_image(const FGE_Renderer* renderer, float x, float y, const FGE_ImageHandle* image)
+    void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const FGE_ImageHandle& image)
     {
-        auto img = fge_state.images.at(*image);
+        auto img = fge_state.images.at(image);
 
         SDL_Rect rect; 
-        rect.x = x; 
-        rect.y = y; 
+        rect.x = pos.x; 
+        rect.y = pos.y; 
         rect.w = img.w; 
         rect.h = img.h;
 
         SDL_RenderCopy(renderer->sdl_renderer, img.sdl_texture, NULL, &rect);
     }
 
-    void render_text(const FGE_Renderer* renderer, float x, float y, const char* text)
+    void render_image(const FGE_Renderer* renderer, 
+        const glm::vec2& pos, 
+        const glm::vec2& size, 
+        const FGE_ImageHandle& image)
+    {
+        auto img = fge_state.images.at(image);
+
+        SDL_Rect rect;
+        rect.x = pos.x;
+        rect.y = pos.y;
+        rect.w = size.x;
+        rect.h = size.y;
+
+        SDL_RenderCopy(renderer->sdl_renderer, img.sdl_texture, NULL, &rect);
+    }
+
+    void render_text(const FGE_Renderer* renderer, const glm::vec2& pos, const char* text)
     {
         SDL_Surface* text_surface = TTF_RenderUTF8_Blended(fge_state.font, text, { 0xFF, 0xFF, 0xFF, 0 });
         print_sdl_error("after TTF_RenderUTF8_Blended");
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer->sdl_renderer, text_surface);
         print_sdl_error("after SDL_CreateTextureFromSurface");
-        SDL_Rect text_rect = { x, y, text_surface->w, text_surface->h };
+        SDL_Rect text_rect = { pos.x, pos.y, text_surface->w, text_surface->h };
         SDL_RenderCopy(renderer->sdl_renderer, texture, 0, &text_rect);
         SDL_FreeSurface(text_surface);
         SDL_DestroyTexture(texture);
