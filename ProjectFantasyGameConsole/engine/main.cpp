@@ -61,14 +61,13 @@ namespace FantasyGameEngine
             return;
         }
 
-        SDL_GL_SetSwapInterval(0);
-
         TTF_Init();
         fge_state.font = TTF_OpenFont("assets/tahoma.ttf", 32);
         print_sdl_error("after TTF_OpenFont");
 
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+        FGE_Inputs last_inputs = {};
         FGE_Inputs inputs = {};
 
         FGE_Renderer r;
@@ -84,16 +83,15 @@ namespace FantasyGameEngine
         bool running = true;
         while (running)
         {
-            inputs.pressed = 0;
-
             SDL_Event event;
+            
             while (SDL_PollEvent(&event))
             {
                 if (event.type == SDL_WINDOWEVENT &&
                     event.window.event == SDL_WINDOWEVENT_CLOSE &&
                     event.window.windowID == SDL_GetWindowID(window))
                     running = false;
-
+                
                 switch (event.type)
                 {
                 case SDL_QUIT:
@@ -103,10 +101,10 @@ namespace FantasyGameEngine
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym)
                     {
-                    case SDLK_w: inputs.pressed |= FGEKC_w; inputs.down |= FGEKC_w; break;
-                    case SDLK_a: inputs.pressed |= FGEKC_a; inputs.down |= FGEKC_a; break;
-                    case SDLK_s: inputs.pressed |= FGEKC_s; inputs.down |= FGEKC_s; break;
-                    case SDLK_d: inputs.pressed |= FGEKC_d; inputs.down |= FGEKC_d; break;
+                    case SDLK_w: inputs.down |= FGEKC_w; break;
+                    case SDLK_a: inputs.down |= FGEKC_a; break;
+                    case SDLK_s: inputs.down |= FGEKC_s; break;
+                    case SDLK_d: inputs.down |= FGEKC_d; break;
                     }
                     break;
 
@@ -125,14 +123,6 @@ namespace FantasyGameEngine
                 }
             }
 
-            SDL_SetRenderDrawColor(renderer, 
-                (Uint8)(clear_color.x * 255), 
-                (Uint8)(clear_color.y * 255), 
-                (Uint8)(clear_color.z * 255), 
-                (Uint8)(clear_color.w * 255));
-
-            SDL_RenderClear(renderer);
-
             timestamp_last = timestamp_now;
             timestamp_now = SDL_GetPerformanceCounter();
             double delta = (double)
@@ -146,9 +136,19 @@ namespace FantasyGameEngine
 
             while (tick_timer > tick_length_ms)
             {
+                inputs.pressed = inputs.down & ~last_inputs.down;
                 update_func(inputs);
                 tick_timer -= tick_length_ms;
+                last_inputs.down = inputs.down;
             }
+
+            SDL_SetRenderDrawColor(renderer,
+                (Uint8)(clear_color.x * 255),
+                (Uint8)(clear_color.y * 255),
+                (Uint8)(clear_color.z * 255),
+                (Uint8)(clear_color.w * 255));
+
+            SDL_RenderClear(renderer);
 
             render_func(&r, delta);
 

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <thread>
 
+#include "FantasyGameEngine/CollisionDetection.hpp"
 #include "FantasyGameEngine/FantasyGameEngine.hpp"
 #include "FantasyGameEngine/FileManagement.hpp"
 #include "FantasyGameEngine/ScoreManagement.hpp"
@@ -14,6 +15,7 @@ struct GameState {
 	bool started = false;
 	FGE_ImageHandle img;
 	std::vector<glm::vec2> block_pos;
+	std::vector<glm::vec2> bullet_pos;
 	float char_pos = 500;
 } game_state;
 
@@ -31,10 +33,37 @@ void update(const FGE_Inputs& inputs)
 {
 	if (inputs.down & FGEKC_a) game_state.char_pos -= 40;
 	if (inputs.down & FGEKC_d) game_state.char_pos += 40;
+	if (inputs.pressed & FGEKC_w) game_state.bullet_pos.push_back({ game_state.char_pos, 600 });
 
 	for (auto& pos : game_state.block_pos)
 	{
-		pos += glm::vec2(0, 10);
+		pos += glm::vec2(0, 8);
+	}
+
+	for (int i = 0; i < game_state.bullet_pos.size(); )
+	{
+		game_state.bullet_pos[i] += glm::vec2(0, -40);
+
+		if (game_state.bullet_pos[i].y < -50)
+		{
+			game_state.bullet_pos.erase(game_state.bullet_pos.begin() + i);
+			continue;
+		}
+
+		for (int block_i = 0; block_i < game_state.block_pos.size(); )
+		{
+			if (collision::aabb(
+				game_state.bullet_pos[i], { 50, 50 },
+				game_state.block_pos[block_i], { 50, 50 }))
+			{
+				game_state.block_pos.erase(game_state.block_pos.begin() + block_i);
+				continue;
+			}
+
+			block_i++;
+		}
+
+		i++;
 	}
 }
 
@@ -44,7 +73,7 @@ void render(const FGE_Renderer* renderer, double delta)
 
 	render_text(renderer, { 5, 5 }, text.c_str());
 
-	render_rect(renderer, { game_state.char_pos, 600 }, { 70, 70 }, 1, 0, 0);
+	render_rect(renderer, { game_state.char_pos, 600 }, { 70, 70 }, 1, 0, 1);
 
 	for (const auto& pos : game_state.block_pos)
 	{
@@ -53,11 +82,19 @@ void render(const FGE_Renderer* renderer, double delta)
 			{ 50, 50 },
 			game_state.img);
 	}
+
+	for (const auto& pos : game_state.bullet_pos)
+	{
+		FantasyGameEngine::render_rect(renderer,
+			pos,
+			{ 50, 50 },
+			1, 0, 0);
+	}
 }
 
 int main()
 {
-	FantasyGameEngine::run(init, update, render, 0.25f * 1000);
+	FantasyGameEngine::run(init, update, render, 0.1f * 1000);
 
 	return 0;
 }
