@@ -1,5 +1,3 @@
-#include <vector>
-
 #include "SDL.h"
 #include "SDL_ttf.h"
 #include "SDL_image.h"
@@ -11,7 +9,7 @@
 #include "lua.hpp"
 #include "sol/sol.hpp"
 
-#include "_FantasyGameEngine.hpp"
+#include "FantasyGameEngine.hpp"
 
 namespace FantasyGameEngine
 {
@@ -79,5 +77,13 @@ namespace FantasyGameEngine
         SDL_RenderCopy(renderer->sdl_renderer, texture, 0, &text_rect);
         SDL_FreeSurface(text_surface);
         SDL_DestroyTexture(texture);
+    }
+
+    void print_sdl_error(const char* note)
+    {
+        char err_msg_buf[1024] = {};
+        SDL_GetErrorMsg(err_msg_buf, 1024);
+        if (err_msg_buf[0] == 0) return;
+        printf("sdl error (%s): %s\n", note, err_msg_buf);
     }
 }
