@@ -14,6 +14,14 @@
 
 namespace FantasyGameEngine
 {
+    struct GameState {
+        bool started = false;
+        FGE_ImageHandle img;
+        std::vector<glm::vec2> block_pos;
+        std::vector<glm::vec2> bullet_pos;
+        float char_pos = 500;
+    } game_state;
+
     void run(
         FGE_InitFunc init_func,
         FGE_UpdateFunc update_func,
@@ -53,6 +61,18 @@ namespace FantasyGameEngine
             return;
         }
 
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io.Fonts->AddFontFromFileTTF("assets/PublicPixel.ttf", 18.0f, NULL, NULL);
+
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+        ImGui_ImplSDLRenderer_Init(renderer);
+
         TTF_Init();
         fge_state.font = TTF_OpenFont("assets/tahoma.ttf", 32);
         print_sdl_error("after TTF_OpenFont");
@@ -79,6 +99,8 @@ namespace FantasyGameEngine
 
             while (SDL_PollEvent(&event))
             {
+                ImGui_ImplSDL2_ProcessEvent(&event);
+
                 if (event.type == SDL_WINDOWEVENT &&
                     event.window.event == SDL_WINDOWEVENT_CLOSE &&
                     event.window.windowID == SDL_GetWindowID(window))
@@ -134,6 +156,23 @@ namespace FantasyGameEngine
                 last_inputs.down = inputs.down;
             }
 
+            ImGui_ImplSDLRenderer_NewFrame();
+            ImGui_ImplSDL2_NewFrame();
+            ImGui::NewFrame();
+            ImGui::Begin("debug controls");
+
+            if (ImGui::Button("reset"))
+            {
+                game_state.block_pos.clear();
+                for (int i = 0; i < 10; i++)
+                {
+                    game_state.block_pos.push_back({ 30 + i * 100, 30 + i * 10 });
+                }
+            }
+
+            ImGui::End();
+            ImGui::Render();
+
             SDL_SetRenderDrawColor(renderer,
                 (Uint8)(clear_color.x * 255),
                 (Uint8)(clear_color.y * 255),
@@ -144,8 +183,14 @@ namespace FantasyGameEngine
 
             render_func(&r, delta);
 
+            ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+
             SDL_RenderPresent(renderer);
         }
+
+        ImGui_ImplSDLRenderer_Shutdown();
+        ImGui_ImplSDL2_Shutdown();
+        ImGui::DestroyContext();
 
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
@@ -153,14 +198,6 @@ namespace FantasyGameEngine
 
         return;
     }
-
-    struct GameState {
-        bool started = false;
-        FGE_ImageHandle img;
-        std::vector<glm::vec2> block_pos;
-        std::vector<glm::vec2> bullet_pos;
-        float char_pos = 500;
-    } game_state;
 
     void init(const FGE_Renderer* renderer)
     {
