@@ -5,6 +5,4 @@ enable_testing()
 include(CTest)
 
 add_subdirectory(external_deps)
-add_subdirectory(engine)
-add_subdirectory(game)
-add_subdirectory(testing)
+add_subdirectory(src)
