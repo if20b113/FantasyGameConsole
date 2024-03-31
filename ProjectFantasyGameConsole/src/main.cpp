@@ -14,12 +14,165 @@
 
 namespace FantasyGameEngine
 {
+    typedef std::vector<std::vector<std::vector<int>>> Piece;
+
+    const std::vector<Piece> pieces = {
+        {
+            {
+                {1    },
+                {1    },
+                {1,1  },
+            },
+            {
+                {1,1,1},
+                {1    },
+            },
+            {
+                {0,1,1},
+                {0,0,1},
+                {0,0,1}
+            },
+            {
+                {     },
+                {0,0,1},
+                {1,1,1}
+            }
+        },
+        {
+            {
+                {     },
+                {1,1,1},
+            },
+            {
+                {0,1  },
+                {0,1  },
+                {0,1  }
+            }
+        }
+    };
+
+    constexpr int grid_size_x = 25;
+    constexpr int grid_size_y = 45;
+    constexpr int cell_size_x = 15;
+    constexpr int cell_size_y = 15;
+
     struct GameState {
         bool started = false;
         FGE_ImageHandle img;
-        std::vector<glm::vec2> block_pos;
-        std::vector<glm::vec2> bullet_pos;
-        float char_pos = 500;
+        glm::ivec2 active_piece_pos = { 5, 0 };
+        int active_piece = 0; // -1 means no piece active
+        int orientation = 0;
+        std::array<std::array<int, grid_size_y>, grid_size_x> grid;
+
+        void clear_grid()
+        {
+            for (auto& col : grid)
+                for (auto& cell : col)
+                    cell = 0;
+        }
+
+        void reset_state()
+        {
+            game_state.orientation = 0;
+            game_state.active_piece = 0;
+            game_state.active_piece_pos = { 5, 0 };
+            clear_grid();
+        }
+
+        void solidify()
+        {
+            if (active_piece == -1) return;
+            const auto& piece_orientations = pieces[game_state.active_piece];
+            const auto& columns = piece_orientations[game_state.orientation % piece_orientations.size()];
+            for (std::size_t col_i = 0; col_i < columns.size(); col_i++)
+                for (std::size_t row_i = 0; row_i < columns[col_i].size(); row_i++)
+                    if (columns[col_i][row_i] != 0)
+                    {
+                        int x = row_i + active_piece_pos.x;
+                        int y = col_i + active_piece_pos.y;
+                        if (x < 0 || x >= grid_size_x ||
+                            y < 0 || y >= grid_size_y)
+                            continue;
+
+                        grid[x][y] = 1;
+                    }
+        }
+
+        bool collide()
+        {
+            if (active_piece == -1) return false;
+            const auto& piece_orientations = pieces[game_state.active_piece];
+            const auto& columns = piece_orientations[game_state.orientation % piece_orientations.size()];
+            for (std::size_t col_i = 0; col_i < columns.size(); col_i++)
+                for (std::size_t row_i = 0; row_i < columns[col_i].size(); row_i++)
+                    if (columns[col_i][row_i] != 0)
+                    {
+                        int x = row_i + active_piece_pos.x;
+                        int y = col_i + active_piece_pos.y;
+
+                        if (y == grid_size_y - 1 || game_state.grid[x][y + 1] != 0)
+                        {
+                            return true;
+                        }
+                    }
+
+            return false;
+        }
+
+        void shift(int shift_x)
+        {
+            if (active_piece == -1) return;
+            bool free = true;
+            const auto& piece_orientations = pieces[game_state.active_piece];
+            const auto& columns = piece_orientations[game_state.orientation % piece_orientations.size()];
+            for (std::size_t col_i = 0; col_i < columns.size(); col_i++)
+            {
+                for (std::size_t row_i = 0; row_i < columns[col_i].size(); row_i++)
+                {
+                    if (columns[col_i][row_i] == 0) continue;
+
+                    int x = row_i + active_piece_pos.x;
+                    int y = col_i + active_piece_pos.y;
+
+                    if (shift_x < 0)
+                    {
+                        if (x == 0 || grid[x - 1][y] != 0)
+                        {
+                            free = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (x == grid_size_x - 1 || grid[x + 1][y] != 0)
+                        {
+                            free = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!free) break;
+            }
+
+            if (free) active_piece_pos.x += shift_x;
+        }
+
+        void shift_rows()
+        {
+            while (true)
+            {
+                // stop if last row full
+                for (std::size_t x = 0; x < grid_size_x; x++)
+                    if (grid[x][grid_size_y - 1] == 0)
+                        return;
+
+                // else shift rows
+                for (std::size_t x = 0; x < grid_size_x; x++)
+                    for (std::size_t y = grid_size_y - 1; y >= 1; y--)
+                        grid[x][y] = grid[x][y - 1];
+            }
+        }
     } game_state;
 
     void run(
@@ -163,11 +316,12 @@ namespace FantasyGameEngine
 
             if (ImGui::Button("reset"))
             {
-                game_state.block_pos.clear();
-                for (int i = 0; i < 10; i++)
-                {
-                    game_state.block_pos.push_back({ 30 + i * 100, 30 + i * 10 });
-                }
+                game_state.reset_state();
+            }
+
+            if (ImGui::Button("solidify"))
+            {
+                game_state.solidify();
             }
 
             ImGui::End();
@@ -202,49 +356,25 @@ namespace FantasyGameEngine
     void init(const FGE_Renderer* renderer)
     {
         game_state.img = load_image(renderer, "assets/button.png");
-
-        for (int i = 0; i < 10; i++)
-        {
-            game_state.block_pos.push_back({ 30 + i * 100, 30 + i * 10 });
-        }
     }
 
     void update(const FGE_Inputs& inputs)
     {
-        if (inputs.down & FGEKC_a) game_state.char_pos -= 40;
-        if (inputs.down & FGEKC_d) game_state.char_pos += 40;
-        if (inputs.pressed & FGEKC_w) game_state.bullet_pos.push_back({ game_state.char_pos, 600 });
+        if (inputs.down & FGEKC_a) game_state.shift(-1);
+        if (inputs.down & FGEKC_d) game_state.shift(+1);
+        if (inputs.pressed & FGEKC_w) game_state.orientation += 1;
+        if (inputs.pressed & FGEKC_s) game_state.orientation -= 1;
 
-        for (auto& pos : game_state.block_pos)
+        if (game_state.collide())
         {
-            pos += glm::vec2(0, 8);
+            game_state.solidify();
+            game_state.active_piece_pos = { 5, 0 };
+            game_state.active_piece = 1; // make random
+
+            game_state.shift_rows();
         }
-
-        for (int i = 0; i < game_state.bullet_pos.size(); )
-        {
-            game_state.bullet_pos[i] += glm::vec2(0, -40);
-
-            if (game_state.bullet_pos[i].y < -50)
-            {
-                game_state.bullet_pos.erase(game_state.bullet_pos.begin() + i);
-                continue;
-            }
-
-            for (int block_i = 0; block_i < game_state.block_pos.size(); )
-            {
-                if (collision::aabb(
-                    game_state.bullet_pos[i], { 50, 50 },
-                    game_state.block_pos[block_i], { 50, 50 }))
-                {
-                    game_state.block_pos.erase(game_state.block_pos.begin() + block_i);
-                    continue;
-                }
-
-                block_i++;
-            }
-
-            i++;
-        }
+        else
+            game_state.active_piece_pos.y += 1;
     }
 
     void render(const FGE_Renderer* renderer, double delta)
@@ -253,95 +383,103 @@ namespace FantasyGameEngine
 
         render_text(renderer, { 5, 5 }, text.c_str());
 
-        render_rect(renderer, { game_state.char_pos, 600 }, { 70, 70 }, 1, 0, 1);
+        // render grid
+        for (std::size_t x = 0; x < grid_size_x; x++)
+            for (std::size_t y = 0; y < grid_size_y; y++)
+                if (game_state.grid[x][y] != 0)
+                    FantasyGameEngine::render_rect(renderer,
+                        {
+                            x * cell_size_x,
+                            y * cell_size_y
+                        },
+                        { cell_size_x, cell_size_y },
+                        0.8, 0, 0);
 
-        for (const auto& pos : game_state.block_pos)
-        {
-            FantasyGameEngine::render_image(renderer,
-                pos,
-                { 50, 50 },
-                game_state.img);
-        }
-
-        for (const auto& pos : game_state.bullet_pos)
-        {
-            FantasyGameEngine::render_rect(renderer,
-                pos,
-                { 50, 50 },
-                1, 0, 0);
-        }
+        // render active piece
+        const auto& piece_orientations = pieces[game_state.active_piece];
+        const auto& columns = piece_orientations[game_state.orientation % piece_orientations.size()];
+        for (std::size_t col_i = 0; col_i < columns.size(); col_i++)
+            for (std::size_t row_i = 0; row_i < columns[col_i].size(); row_i++)
+                if (columns[col_i][row_i] != 0)
+                    FantasyGameEngine::render_rect(renderer,
+                        {
+                            (row_i + game_state.active_piece_pos.x) * cell_size_x,
+                            (col_i + game_state.active_piece_pos.y) * cell_size_y,
+                        },
+                        { cell_size_x, cell_size_y },
+                        1, 0, 0);
     }
 }
 
 int main()
 {
     FantasyGameEngine::run(
-        FantasyGameEngine::init, 
-        FantasyGameEngine::update, 
-        FantasyGameEngine::render, 
+        FantasyGameEngine::init,
+        FantasyGameEngine::update,
+        FantasyGameEngine::render,
         0.1f * 1000);
 
     return 0;
 }
 
 
-    /*
+/*
 int async_add(int a, int b)
 {
-	return a + b;
+    return a + b;
 }
 int run_engine_tests()
 {
-	puts("TESTING BasicThreadPool ...");
+    puts("TESTING BasicThreadPool ...");
 
-	FantasyGameEngine::BasicThreadPool btp(5);
+    FantasyGameEngine::BasicThreadPool btp(5);
 
-	auto work_result_1 = btp.enqueue(async_add, 4, 7);
-	auto work_result_2 = btp.enqueue(async_add, 123, 12);
+    auto work_result_1 = btp.enqueue(async_add, 4, 7);
+    auto work_result_2 = btp.enqueue(async_add, 123, 12);
 
-	std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
-	printf("work result: %d, %d\n", 
-		work_result_1.get(), 
-		work_result_2.get());
+    printf("work result: %d, %d\n",
+        work_result_1.get(),
+        work_result_2.get());
 
-	puts("\nTESTING LUA...");
-	FantasyGameEngine::test_lua();
-	
-	puts("\nTESTING SDL...");
-	printf("SDL TESTING RETURNED %d\n", 
-		FantasyGameEngine::test_sdl());
+    puts("\nTESTING LUA...");
+    FantasyGameEngine::test_lua();
 
-	puts("\nTESTING FS...");
-	puts("reading file ...");
-	auto test_file = FantasyGameEngine::read_text_from_file("assets/scripts/test.lua");
-	std::cout << test_file << std::endl;
+    puts("\nTESTING SDL...");
+    printf("SDL TESTING RETURNED %d\n",
+        FantasyGameEngine::test_sdl());
 
-	FantasyGameEngine::score_system_init();
+    puts("\nTESTING FS...");
+    puts("reading file ...");
+    auto test_file = FantasyGameEngine::read_text_from_file("assets/scripts/test.lua");
+    std::cout << test_file << std::endl;
 
-	FantasyGameEngine::update_score("adam", 10);
-	FantasyGameEngine::update_score("florian", 15);
-	FantasyGameEngine::update_score("faisalhanbali", 20); // Names longer than 8 chars can still be saved, without strict mode. Turning on strict mode is probably not worth it.
+    FantasyGameEngine::score_system_init();
 
-	for (const auto& e : FantasyGameEngine::get_scores())
-		printf("got row from get_scores: %s, %d, %s\n",
-			std::get<0>(e).c_str(),
-			std::get<1>(e),
-			std::get<2>(e).c_str());
+    FantasyGameEngine::update_score("adam", 10);
+    FantasyGameEngine::update_score("florian", 15);
+    FantasyGameEngine::update_score("faisalhanbali", 20); // Names longer than 8 chars can still be saved, without strict mode. Turning on strict mode is probably not worth it.
 
-	std::this_thread::sleep_for(std::chrono::seconds(2)); // Sleep to test if different timestamp is generated.
+    for (const auto& e : FantasyGameEngine::get_scores())
+        printf("got row from get_scores: %s, %d, %s\n",
+            std::get<0>(e).c_str(),
+            std::get<1>(e),
+            std::get<2>(e).c_str());
 
-	FantasyGameEngine::update_score("adam", 25);
+    std::this_thread::sleep_for(std::chrono::seconds(2)); // Sleep to test if different timestamp is generated.
 
-	puts("after update:");
-	for (const auto& e : FantasyGameEngine::get_scores())
-		printf("got row from get_scores: %s, %d, %s\n",
-			std::get<0>(e).c_str(),
-			std::get<1>(e),
-			std::get<2>(e).c_str());
+    FantasyGameEngine::update_score("adam", 25);
 
-	FantasyGameEngine::write_text_to_file("test.txt", test_file);
+    puts("after update:");
+    for (const auto& e : FantasyGameEngine::get_scores())
+        printf("got row from get_scores: %s, %d, %s\n",
+            std::get<0>(e).c_str(),
+            std::get<1>(e),
+            std::get<2>(e).c_str());
 
-	return 0;
+    FantasyGameEngine::write_text_to_file("test.txt", test_file);
+
+    return 0;
 }
 */
