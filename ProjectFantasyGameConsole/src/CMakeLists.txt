@@ -7,7 +7,11 @@ add_executable(FantasyGame
     JobManagement.cpp
     main.cpp
     rendering.cpp
-    ScoreManagement.cpp)
+    ScoreManagement.cpp
+    AESEnc.cpp
+    FileIO.cpp
+    SaveData.cpp
+    MemoryData.cpp)
 
 target_link_libraries(FantasyGame PRIVATE external_deps)
 target_include_directories(FantasyGame PRIVATE .)
@@ -23,7 +27,11 @@ add_executable(TestExe
     JobManagement.cpp
     rendering.cpp
     ScoreManagement.cpp
-    test.cpp)
+    test.cpp
+    AESEnc.cpp
+    FileIO.cpp
+    SaveData.cpp
+    MemoryData.cpp)
 target_link_libraries(TestExe PRIVATE gtest_main external_deps)
 target_include_directories(TestExe PRIVATE .)
 target_compile_features(TestExe PRIVATE cxx_std_17)

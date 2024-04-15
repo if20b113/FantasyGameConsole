@@ -62,7 +62,8 @@ namespace FantasyGameEngine
         glm::ivec2 active_piece_pos = { 5, 0 };
         int active_piece = 0; // -1 means no piece active
         int orientation = 0;
-        std::array<std::array<int, grid_size_y>, grid_size_x> grid;
+        typedef  std::array<std::array<int, grid_size_y>, grid_size_x> GameGrid;
+        GameGrid grid{};
 
         void clear_grid()
         {
