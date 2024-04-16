@@ -18,12 +18,15 @@ private:
 		m_saveData.reserve(mem.GetData().size());
 		m_saveData.swap(mem.GetData());
 	}
-	bool SaveStructureToGameField(std::vector<unsigned char> inData, std::array < std::array<int, 45>, 25>& outField)
+	bool SaveStructureToGameField(std::vector<unsigned char>& inData, std::array < std::array<int, 45>, 25>& outField)
 	{
 		MemoryData mem;
-		mem.GetData() = inData;
-		for (auto it : outField)
-			for (int value : it)
+		mem.GetData().reserve(inData.size());
+		mem.GetData().resize(inData.size());
+		mem.GetData().swap(inData);
+		mem.AdjustPositions();
+		for (auto& it : outField)
+			for (int& value : it)
 				if (!mem.ReadDataFromVec(value)) // we read from position 0, so we dont have to read from reverse
 					return false;// Error;
 		return true;

@@ -24,7 +24,7 @@ public:
 	{
 		Reset();
 	}
-	std::vector< unsigned char > GetData()
+	std::vector< unsigned char >& GetData()
 	{
 		return m_Data;
 	}
