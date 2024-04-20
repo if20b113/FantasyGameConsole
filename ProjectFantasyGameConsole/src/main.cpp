@@ -57,12 +57,30 @@ namespace FantasyGameEngine
     constexpr int cell_size_y = 15;
 
     struct GameState {
+        const glm::ivec2 pos_null = { -1, -1 };
+
         bool started = false;
         FGE_ImageHandle img;
+        
+        int tick_timer = 0;
+        
         glm::ivec2 active_piece_pos = { 5, 0 };
-        int active_piece = 0; // -1 means no piece active
+        int active_piece = -1; // -1 means no piece
+        int next_piece = -1; // -1 means no piece
+        int hold_slot = -1; // -1 means no piece
         int orientation = 0;
         std::array<std::array<int, grid_size_y>, grid_size_x> grid;
+
+        // powerup ids:
+        //  0 = none
+        //  1 = bullet
+        //  2 = delete top row
+        int powerup_pickup_type = 0;
+        glm::ivec2 powerup_pickup_pos = pos_null;
+        int active_powerup = 0;
+
+        int powerup_bullet_count = 0;
+        glm::ivec2 powerup_bullet_pos = pos_null;
 
         void clear_grid()
         {
@@ -73,10 +91,20 @@ namespace FantasyGameEngine
 
         void reset_state()
         {
-            game_state.orientation = 0;
-            game_state.active_piece = 0;
-            game_state.active_piece_pos = { 5, 0 };
+            tick_timer = 0;
+
+            active_piece = generate_next_piece();
+            active_piece_pos = { 5, 0 };
+            next_piece = generate_next_piece();
+            hold_slot = -1;
+            orientation = 0;
             clear_grid();
+
+            active_powerup = 0;
+            spawn_powerup();
+
+            powerup_bullet_count = 0;
+            powerup_bullet_pos = pos_null;
         }
 
         void solidify()
@@ -98,9 +126,50 @@ namespace FantasyGameEngine
                     }
         }
 
+        void rotate_piece(int dir)
+        {
+            if (active_piece == -1) return;
+            int new_orientation = orientation + dir;
+            const auto& piece_orientations = pieces[game_state.active_piece];
+            const auto& columns = piece_orientations[new_orientation % piece_orientations.size()];
+            for (std::size_t col_i = 0; col_i < columns.size(); col_i++)
+                for (std::size_t row_i = 0; row_i < columns[col_i].size(); row_i++)
+                    if (columns[col_i][row_i] != 0)
+                    {
+                        int x = row_i + active_piece_pos.x;
+                        int y = col_i + active_piece_pos.y;
+
+                        if (x < 0 || x >= grid_size_x || y < 0 || y >= grid_size_y || grid[x][y] != 0)
+                        {
+                            return;
+                        }
+                    }
+
+            orientation = new_orientation;
+        }
+
+        int generate_powerup_type()
+        {
+            return 1; // TODO: generate random
+        }
+
+        void init_powerups()
+        {
+            switch (active_powerup)
+            {
+            case 1:
+                powerup_bullet_count = 3;
+                break;
+            }
+        }
+
         bool collide()
         {
             if (active_piece == -1) return false;
+
+            bool collided = false;
+            bool picked_up_powerup = false;
+
             const auto& piece_orientations = pieces[game_state.active_piece];
             const auto& columns = piece_orientations[game_state.orientation % piece_orientations.size()];
             for (std::size_t col_i = 0; col_i < columns.size(); col_i++)
@@ -110,13 +179,30 @@ namespace FantasyGameEngine
                         int x = row_i + active_piece_pos.x;
                         int y = col_i + active_piece_pos.y;
 
-                        if (y == grid_size_y - 1 || game_state.grid[x][y + 1] != 0)
+                        if (powerup_pickup_pos != pos_null)
                         {
-                            return true;
+                            if (x == powerup_pickup_pos.x && y == powerup_pickup_pos.y)
+                                picked_up_powerup = true;
                         }
+
+                        if (y == grid_size_y - 1 || game_state.grid[x][y + 1] != 0)
+                            collided = true;
                     }
 
-            return false;
+            if (collided)
+            {
+                solidify();
+            }
+
+            if (picked_up_powerup)
+            {
+                active_powerup = powerup_pickup_type;
+                printf("got powerup %d\n", active_powerup);
+                init_powerups();
+                spawn_powerup();
+            }
+
+            return collided;
         }
 
         void shift(int shift_x)
@@ -160,17 +246,120 @@ namespace FantasyGameEngine
 
         void shift_rows()
         {
-            while (true)
+            for (std::size_t y = grid_size_y - 1; y > 0; y--)
             {
-                // stop if last row full
+                bool row_full = true;
                 for (std::size_t x = 0; x < grid_size_x; x++)
-                    if (grid[x][grid_size_y - 1] == 0)
-                        return;
+                    if (!grid[x][y])
+                    {
+                        row_full = false;
+                        break;
+                    }
 
-                // else shift rows
-                for (std::size_t x = 0; x < grid_size_x; x++)
-                    for (std::size_t y = grid_size_y - 1; y >= 1; y--)
-                        grid[x][y] = grid[x][y - 1];
+                if (row_full)
+                {
+                    for (std::size_t y2 = y; y2 > 0; y2--)
+                        for (std::size_t x = 0; x < grid_size_x; x++)
+                            grid[x][y2] = grid[x][y2 - 1];
+                    for (std::size_t x = 0; x < grid_size_x; x++)
+                        grid[x][0] = 0; 
+                }
+            }
+        }
+
+        int generate_random_powerup_type()
+        {
+            return 1;  // TODO: make random
+        }
+
+        int generate_random_powerup_pos()
+        {
+            return 0; // TODO: make random
+        }
+
+        int generate_next_piece()
+        {
+            return 1;
+        }
+
+        void spawn_powerup()
+        {
+            std::size_t x = generate_random_powerup_pos();
+
+            for (std::size_t y = 0; y < grid_size_y; y++)
+            {
+                if (grid[x][y])
+                {
+                    powerup_pickup_type = generate_random_powerup_type();
+                    powerup_pickup_pos = { x, y - 1 };
+                    return;
+                }
+            }
+
+            powerup_pickup_type = generate_random_powerup_type();
+            powerup_pickup_pos = { x, grid_size_y - 1};
+        }
+
+        void use_powerup()
+        {
+            printf("use %d\n", active_powerup);
+            printf("check bullet: %d, %d,%d\n", powerup_bullet_count, powerup_bullet_pos.x, powerup_bullet_pos.y);
+            switch (active_powerup)
+            {
+            case 1:
+                if (powerup_bullet_count > 0 && powerup_bullet_pos == pos_null)
+                {
+                    powerup_bullet_count--;
+                    powerup_bullet_pos = {
+                        active_piece_pos.x + 1,
+                        active_piece_pos.y + 1 };
+                    puts("created bulled");
+                }
+                break;
+            case 2:
+                for (std::size_t y = 0; y < grid_size_y; y++)
+                    for (std::size_t x = 0; x < grid_size_x; x++)
+                        if (grid[x][y])
+                            for (std::size_t delete_x = 0; delete_x < grid_size_x; delete_x++)
+                            {
+                                grid[delete_x][y] = 0;
+                                return;
+                            }
+                active_powerup = 0;
+                game_state.spawn_powerup();
+                break;
+            }
+        }
+
+        void hold_piece()
+        {
+            hold_slot = active_piece;
+            active_piece = next_piece;
+            next_piece = generate_next_piece();
+            active_piece_pos.y = 0;
+        }
+
+        void powerup_update_bullet()
+        {
+            if (powerup_bullet_pos != pos_null)
+            {
+                powerup_bullet_pos.y++;
+                
+                if (powerup_bullet_pos.y == grid_size_y)
+                {
+                    powerup_bullet_pos = pos_null;
+                }
+                else if (grid[powerup_bullet_pos.x][powerup_bullet_pos.y])
+                {
+                    grid[powerup_bullet_pos.x][powerup_bullet_pos.y] = 0;
+                    powerup_bullet_pos = pos_null;
+                }
+
+                if (powerup_bullet_pos == pos_null && powerup_bullet_count == 0)
+                {
+                    active_powerup = 0;
+                    game_state.spawn_powerup();
+                }
             }
         }
     } game_state;
@@ -272,6 +461,8 @@ namespace FantasyGameEngine
                     case SDLK_a: inputs.down |= FGEKC_a; break;
                     case SDLK_s: inputs.down |= FGEKC_s; break;
                     case SDLK_d: inputs.down |= FGEKC_d; break;
+                    case SDLK_e: inputs.down |= FGEKC_e; break;
+                    case SDLK_h: inputs.down |= FGEKC_h; break;
                     }
                     break;
 
@@ -282,6 +473,8 @@ namespace FantasyGameEngine
                     case SDLK_a: inputs.down &= ~FGEKC_a; break;
                     case SDLK_s: inputs.down &= ~FGEKC_s; break;
                     case SDLK_d: inputs.down &= ~FGEKC_d; break;
+                    case SDLK_e: inputs.down &= ~FGEKC_e; break;
+                    case SDLK_h: inputs.down &= ~FGEKC_h; break;
                     }
                     break;
 
@@ -356,25 +549,45 @@ namespace FantasyGameEngine
     void init(const FGE_Renderer* renderer)
     {
         game_state.img = load_image(renderer, "assets/button.png");
+        game_state.reset_state();
     }
 
     void update(const FGE_Inputs& inputs)
     {
+        game_state.tick_timer++;
+
         if (inputs.down & FGEKC_a) game_state.shift(-1);
         if (inputs.down & FGEKC_d) game_state.shift(+1);
-        if (inputs.pressed & FGEKC_w) game_state.orientation += 1;
-        if (inputs.pressed & FGEKC_s) game_state.orientation -= 1;
+        if (inputs.pressed & FGEKC_w) game_state.rotate_piece(+1);
+        if (inputs.pressed & FGEKC_s) game_state.rotate_piece(-1);
 
-        if (game_state.collide())
+        if (inputs.pressed & FGEKC_h) game_state.hold_piece();
+        if (inputs.pressed & FGEKC_e) game_state.use_powerup();
+
+        if (game_state.tick_timer % 3 == 0)
         {
-            game_state.solidify();
-            game_state.active_piece_pos = { 5, 0 };
-            game_state.active_piece = 1; // make random
-
             game_state.shift_rows();
+
+            if (game_state.collide())
+            {
+                game_state.active_piece_pos = { 5, 0 };
+
+                if (game_state.hold_slot != -1)
+                {
+                    game_state.active_piece = game_state.hold_slot;
+                    game_state.hold_slot = -1;
+                }
+                else
+                {
+                    game_state.active_piece = game_state.next_piece;
+                    game_state.next_piece = game_state.generate_next_piece();
+                }
+            }
+            else
+                game_state.active_piece_pos.y += 1;
         }
-        else
-            game_state.active_piece_pos.y += 1;
+
+        game_state.powerup_update_bullet();
     }
 
     void render(const FGE_Renderer* renderer, double delta)
@@ -408,6 +621,28 @@ namespace FantasyGameEngine
                         },
                         { cell_size_x, cell_size_y },
                         1, 0, 0);
+
+        if (game_state.powerup_bullet_pos != game_state.pos_null)
+        {
+            FantasyGameEngine::render_rect(renderer,
+                {
+                    game_state.powerup_bullet_pos.x * cell_size_x,
+                    game_state.powerup_bullet_pos.y * cell_size_y
+                },
+                { cell_size_x, cell_size_y },
+                1, 1, 1);
+        }
+
+        if (game_state.powerup_pickup_pos != game_state.pos_null)
+        {
+            FantasyGameEngine::render_rect(renderer,
+                {
+                    game_state.powerup_pickup_pos.x * cell_size_x,
+                    game_state.powerup_pickup_pos.y * cell_size_y
+                },
+                { cell_size_x, cell_size_y },
+                1, 0, 1);
+        }
     }
 }
 
@@ -417,7 +652,7 @@ int main()
         FantasyGameEngine::init,
         FantasyGameEngine::update,
         FantasyGameEngine::render,
-        0.1f * 1000);
+        1.0f/20.0f * 1000);
 
     return 0;
 }

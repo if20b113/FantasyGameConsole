@@ -10,10 +10,12 @@ typedef unsigned int u32;
 
 namespace FantasyGameEngine {
 
-	const u32 FGEKC_w = 0b0001;
-	const u32 FGEKC_a = 0b0010;
-	const u32 FGEKC_s = 0b0100;
-	const u32 FGEKC_d = 0b1000;
+	const u32 FGEKC_w = 1 << 0;
+	const u32 FGEKC_a = 1 << 2;
+	const u32 FGEKC_s = 1 << 3;
+	const u32 FGEKC_d = 1 << 4;
+	const u32 FGEKC_e = 1 << 5;
+	const u32 FGEKC_h = 1 << 6;
 
 	struct FGE_Renderer
 	{
