@@ -18,8 +18,11 @@ namespace FantasyGameEngine
 		bool isenteringName = false;
 		bool Gamestarted = false;
 		bool selectGameMode = false;
+		bool startnewgame = false;
+		bool nameconfirmed = false;
 		int menubutton = 1;
 		int pausebutton = 1;
+		int gamemodebutton = 1;
 		char playername[5] = "....";
 		int abccounter = 0;
 		int index = 0;
@@ -33,6 +36,8 @@ namespace FantasyGameEngine
 		void checkbuttonint();
 		void draw_pause_menu();
 		void draw_score_ui();
+		void handlegameover();
+		void addscore(int score);
 
 	private:
 		const FGE_Renderer* m_renderer;

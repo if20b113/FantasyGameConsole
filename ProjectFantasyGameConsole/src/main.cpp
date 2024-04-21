@@ -186,7 +186,10 @@ namespace FantasyGameEngine
         void reset_state()
         {
             tick_timer = 0;
-
+            score = 0;
+            nextpiececolor = 0;
+            holdpiececolor = 0;
+            currentpiececoloroffset = 1 + rand() % 8;
             active_piece = generate_next_piece();
             active_piece_pos = { 5, 0 };
             next_piece = generate_next_piece();
@@ -742,7 +745,11 @@ namespace FantasyGameEngine
             }
            }
            else {
-               game_state.uirenderer.running = false;
+               //game_state.uirenderer.running = false;
+               game_state.uirenderer.isenteringName = true;
+               game_state.uirenderer.isinGame = false;
+               game_state.uirenderer.Gamestarted = false;
+               
            }
         }
         else{
@@ -751,6 +758,11 @@ namespace FantasyGameEngine
                 if (inputs.pressed & FGEKC_w) game_state.uirenderer.menubutton -= 1;
                 if (inputs.pressed & FGEKC_s) game_state.uirenderer.menubutton += 1;
                 game_state.uirenderer.checkbuttonint();
+            }
+            if(game_state.uirenderer.selectGameMode)
+            {
+                if (inputs.pressed & FGEKC_w) game_state.uirenderer.gamemodebutton -= 1;
+                if (inputs.pressed & FGEKC_s) game_state.uirenderer.gamemodebutton += 1;
             }
             if (inputs.pressed & FGEKC_enter) game_state.uirenderer.HandleInput();
         }
@@ -762,8 +774,27 @@ namespace FantasyGameEngine
             if (inputs.down & FGEKC_d) game_state.uirenderer.index += 1;
 
             game_state.uirenderer.checkbuttonint();
+            if (inputs.pressed & FGEKC_enter) game_state.uirenderer.HandleInput();
         }
-       
+        if (game_state.uirenderer.nameconfirmed) game_state.uirenderer.addscore(game_state.score);
+        if (game_state.uirenderer.startnewgame) 
+        {
+            if (game_state.uirenderer.Gamestarted) 
+            {
+                game_state.uirenderer.isinGame = true;
+                game_state.reset_state();
+                game_state.clear_grid();
+                game_state.uirenderer.startnewgame = false;
+                
+            }
+            else 
+            {
+                game_state.uirenderer.isinGame = true;
+                game_state.uirenderer.startnewgame = false;
+                game_state.uirenderer.Gamestarted = true;
+            }
+           
+        }
 
     }
 
@@ -795,8 +826,8 @@ namespace FantasyGameEngine
                 }
             }
         { //render next piece
-        render_text(renderer, { game_state.FieldRenderer.gridoffset.x + 560, game_state.FieldRenderer.gridoffset.y }, "Next Piece");
-        render_rect(renderer, { game_state.FieldRenderer.gridoffset.x + 560,game_state.FieldRenderer.gridoffset.y}, { 150,150 }, 0, 0, 0, 0.5);
+        render_text(renderer, { game_state.FieldRenderer.gridoffset.x + 565, game_state.FieldRenderer.gridoffset.y }, "Next Piece");
+        render_rect(renderer, { game_state.FieldRenderer.gridoffset.x + 565,game_state.FieldRenderer.gridoffset.y}, { 150,150 }, 0, 0, 0, 0.5);
         const auto& piece_orientations = pieces[game_state.next_piece];
         const auto& columns = piece_orientations[0];
         for (std::size_t col_i = 0; col_i < columns.size(); col_i++)
@@ -807,8 +838,8 @@ namespace FantasyGameEngine
                 }
          }
         }
-        render_text(renderer, { game_state.FieldRenderer.gridoffset.x + 560, game_state.FieldRenderer.gridoffset.y + 200 }, "Hold Piece");
-        render_rect(renderer, { game_state.FieldRenderer.gridoffset.x +560,game_state.FieldRenderer.gridoffset.y+200 }, { 150,150 }, 0, 0, 0, 0.5);
+        render_text(renderer, { game_state.FieldRenderer.gridoffset.x + 565, game_state.FieldRenderer.gridoffset.y + 200 }, "Hold Piece");
+        render_rect(renderer, { game_state.FieldRenderer.gridoffset.x + 565,game_state.FieldRenderer.gridoffset.y+200 }, { 150,150 }, 0, 0, 0, 0.5);
         if (game_state.hold_slot != -1)  // render hold piece
         {
             const auto& piece_orientations = pieces[game_state.hold_slot];
@@ -864,6 +895,11 @@ namespace FantasyGameEngine
         if (game_state.uirenderer.ispaused)
         {
             game_state.uirenderer.draw_pause_menu();
+        }
+
+        if (game_state.uirenderer.isenteringName)
+        {
+            game_state.uirenderer.draw_score_ui();
         }
         //game_state.uirenderer.draw_score_ui();
 

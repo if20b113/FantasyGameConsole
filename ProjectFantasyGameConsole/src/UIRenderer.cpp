@@ -105,7 +105,50 @@ void FantasyGameEngine::UIRenderer::draw_ui()
 		{
 			render_text(m_renderer, { m_width / 2, 5 }, "Controls");
 		}
-		//if()
+		if (selectGameMode) 
+		{
+			FantasyGameEngine::render_image(m_renderer, { 5,5 }, { 150,100 }, m_logo);
+
+			FantasyGameEngine::render_image(m_renderer, title_pos, { 400,200 }, m_title);
+
+			FantasyGameEngine::render_image_sprite_ui(m_renderer, start_button_pos, { 300,75 }, { 0,800 }, { 400,100 }, m_buttons); //New Game
+			FantasyGameEngine::render_image_sprite_ui(m_renderer, score_button_pos, { 300,75 }, { 400,700 }, { 400,100 }, m_buttons); //Continue
+			FantasyGameEngine::render_image_sprite_ui(m_renderer, controls_button_pos, { 300,75 }, { 400,600 }, { 400,100 }, m_buttons); //Load
+			FantasyGameEngine::render_image_sprite_ui(m_renderer, exit_button_pos, { 300,75 }, { 400,400 }, { 400,100 }, m_buttons); //Main Menu
+
+			switch (gamemodebutton)
+			{
+			case 1:
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, start_button_pos, { 300,75 }, { 0,800 }, { 400,100 }, m_buttons); //New Game
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, score_button_pos, { 300,75 }, { 400,700 }, { 400,100 }, m_buttons); //Continue
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, controls_button_pos, { 300,75 }, { 400,600 }, { 400,100 }, m_buttons); //Load
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, exit_button_pos, { 300,75 }, { 400,400 }, { 400,100 }, m_buttons); //Main Menu
+				break;
+			case 2:
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, start_button_pos, { 300,75 }, { 400,800 }, { 400,100 }, m_buttons); //New Game
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, score_button_pos, { 300,75 }, { 0,700 }, { 400,100 }, m_buttons); //Continue
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, controls_button_pos, { 300,75 }, { 400,600 }, { 400,100 }, m_buttons); //Load
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, exit_button_pos, { 300,75 }, { 400,400 }, { 400,100 }, m_buttons); //Main Menu
+				break;
+			case 3:
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, start_button_pos, { 300,75 }, { 400,800 }, { 400,100 }, m_buttons); //New Game
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, score_button_pos, { 300,75 }, { 400,700 }, { 400,100 }, m_buttons); //Continue
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, controls_button_pos, { 300,75 }, { 0,600 }, { 400,100 }, m_buttons); //Load
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, exit_button_pos, { 300,75 }, { 400,400 }, { 400,100 }, m_buttons); //Main Menu
+				break;
+			case 4:
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, start_button_pos, { 300,75 }, { 400,800 }, { 400,100 }, m_buttons); //New Game
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, score_button_pos, { 300,75 }, { 400,700 }, { 400,100 }, m_buttons); //Continue
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, controls_button_pos, { 300,75 }, { 400,600 }, { 400,100 }, m_buttons); //Load
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, exit_button_pos, { 300,75 }, { 0,400 }, { 400,100 }, m_buttons); //Main Menu
+				break;
+			default:
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, start_button_pos, { 300,75 }, { 400,800 }, { 400,100 }, m_buttons); //New Game
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, score_button_pos, { 300,75 }, { 400,700 }, { 400,100 }, m_buttons); //Continue
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, controls_button_pos, { 300,75 }, { 400,600 }, { 400,100 }, m_buttons); //Load
+				FantasyGameEngine::render_image_sprite_ui(m_renderer, exit_button_pos, { 300,75 }, { 400,400 }, { 400,100 }, m_buttons); //Main Menu
+			}
+		}
 	}
 
 }
@@ -125,7 +168,7 @@ void FantasyGameEngine::UIRenderer::HandleInput()
 			switch (menubutton) 
 			{
 			case 1: 
-				isinGame = true; 
+				selectGameMode = true;
 				isinMainMenu = false;
 				break;
 			case 2: 	
@@ -154,6 +197,33 @@ void FantasyGameEngine::UIRenderer::HandleInput()
 			isinMainMenu = true;
 			isinControls = false;
 		}
+		else if (selectGameMode) 
+		{
+			switch (gamemodebutton)
+			{
+			case 1:
+				startnewgame = true;
+				selectGameMode = false;
+				break;
+			case 2:
+				if(Gamestarted)
+				{
+				isinGame = true;
+				selectGameMode = false;
+				}
+				break;
+			case 3:
+				
+				selectGameMode = false;
+				break;
+			case 4:
+				isinMainMenu = true;
+				selectGameMode = false;
+				break;
+			default:
+				gamemodebutton = 1;
+			}
+		}
 			
 	}
 	if (ispaused)
@@ -164,6 +234,11 @@ void FantasyGameEngine::UIRenderer::HandleInput()
 			isinGame = false;
 			isinMainMenu = true;
 		}
+	}
+	if (isenteringName) 
+	{
+		isenteringName = false;
+		nameconfirmed = true;
 	}
 }
 
@@ -235,12 +310,35 @@ void FantasyGameEngine::UIRenderer::draw_pause_menu()
 
 void FantasyGameEngine::UIRenderer::draw_score_ui()
 {
+		render_rect(m_renderer, { 0,0 }, { 1280,720 }, 0, 0, 0, 0.5);
 		playername[index] = 65 + abccounter;
 
 		render_text(m_renderer, { m_width / 2-250,m_height / 2 }, "Enter your name:");
 
 		render_text(m_renderer, { m_width / 2,m_height / 2 }, playername);
 }
+
+void FantasyGameEngine::UIRenderer::handlegameover()
+{
+	isinGame = false;
+	Gamestarted = false;
+	isenteringName = true;
+}
+
+void FantasyGameEngine::UIRenderer::addscore(int score)
+{
+	std::tuple<std::string, int> scoretuple;
+
+	scoretuple = std::make_tuple(playername, score);
+
+	scores.push_back(scoretuple);
+
+	isenteringName = false;
+	nameconfirmed = false;
+	isinMainMenu = true;
+}
+
+
 
 
 
