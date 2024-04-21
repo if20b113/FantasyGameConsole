@@ -10,10 +10,14 @@ typedef unsigned int u32;
 
 namespace FantasyGameEngine {
 
-	const u32 FGEKC_w = 0b0001;
-	const u32 FGEKC_a = 0b0010;
-	const u32 FGEKC_s = 0b0100;
-	const u32 FGEKC_d = 0b1000;
+	const u32 FGEKC_w = 1 << 0;
+	const u32 FGEKC_a = 1 << 2;
+	const u32 FGEKC_s = 1 << 3;
+	const u32 FGEKC_d = 1 << 4;
+	const u32 FGEKC_e = 1 << 5;
+	const u32 FGEKC_h = 1 << 6;
+	const u32 FGEKC_enter = 1 << 7;
+	const u32 FGEKC_esc = 1 << 8;
 
 	struct FGE_Renderer
 	{
@@ -53,9 +57,23 @@ namespace FantasyGameEngine {
 
 	FGE_ImageHandle load_image(const FGE_Renderer* renderer, const char* path);
 	void render_rect (const FGE_Renderer* renderer, const glm::vec2& pos, const glm::vec2& size, float r, float g, float b);
+	void render_rect(const FGE_Renderer* renderer, const glm::vec2& pos, const glm::vec2& size, float r, float g, float b, float a);
 	void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const FGE_ImageHandle& image);
 	void render_image(const FGE_Renderer* renderer, const glm::vec2& pos, const glm::vec2& size, const FGE_ImageHandle& image);
+	void render_image_sprite(const FGE_Renderer* renderer,
+		const glm::vec2& pos,
+		const glm::vec2& size,
+		const glm::vec2& posimg,
+		const glm::vec2& whimg,
+		const FGE_ImageHandle& image);
+	void render_image_sprite_ui(const FGE_Renderer* renderer,
+		const glm::vec2& pos,
+		const glm::vec2& size,
+		const glm::vec2& posimg,
+		const glm::vec2& whimg,
+		const FGE_ImageHandle& image);
 	void render_text (const FGE_Renderer* renderer, const glm::vec2& pos, const char* text);
+	void render_text_colored(const FGE_Renderer* renderer, const glm::vec2& pos, const char* text, SDL_Color color);
 	void run(
 		FGE_InitFunc init_func,
 		FGE_UpdateFunc update_func, 
