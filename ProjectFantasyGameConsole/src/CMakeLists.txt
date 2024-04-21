@@ -7,7 +7,9 @@ add_executable(FantasyGame
     JobManagement.cpp
     main.cpp
     rendering.cpp
-    ScoreManagement.cpp)
+    ScoreManagement.cpp
+    TetrisRenderer.cpp
+    UIRenderer.cpp)
 
 target_link_libraries(FantasyGame PRIVATE external_deps)
 target_include_directories(FantasyGame PRIVATE .)

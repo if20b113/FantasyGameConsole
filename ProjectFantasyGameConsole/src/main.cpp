@@ -705,12 +705,12 @@ namespace FantasyGameEngine
 
                 if (game_state.tick_timer % 3 == 0)
                 {
+                    game_state.shift_rows();
 
                     if (game_state.collide())
                     {
                         game_state.active_piece_pos = { 5, 0 };
                         game_state.currentpiececoloroffset = 1 + rand() % 8;
-                        game_state.shift_rows();
 
                         game_state.active_piece_pos = { 5, 0 };
 
