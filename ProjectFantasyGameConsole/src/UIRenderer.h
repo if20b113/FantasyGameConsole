@@ -20,6 +20,8 @@ namespace FantasyGameEngine
 		bool selectGameMode = false;
 		bool startnewgame = false;
 		bool nameconfirmed = false;
+		bool loadgame = false;
+		bool savegame = false;
 		int menubutton = 1;
 		int pausebutton = 1;
 		int gamemodebutton = 1;
@@ -52,8 +54,6 @@ namespace FantasyGameEngine
 		glm::vec2 title_pos;
 		glm::vec2 controls_button_pos;
 		std::vector<std::tuple<std::string, int>> scores;
-		
-
 	};
 }
 

@@ -1,5 +1,6 @@
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
+#include <SDL_mixer.h>
 #include<cstdlib>
 
 
@@ -153,6 +154,7 @@ namespace FantasyGameEngine
         FGE_ImageHandle blocks;
         TetrisRenderer FieldRenderer;
         UIRenderer uirenderer;
+        
 
         glm::ivec2 active_piece_pos = { 5, 0 };
         const glm::ivec2 pos_null = { -1, -1 };
@@ -163,7 +165,13 @@ namespace FantasyGameEngine
         int nextpiececolor = 0;
         int holdpiececolor = 0;
         int currentpiececoloroffset = 0;
+        bool musicplaying = false;
         std::array<std::array<int, grid_size_y>, grid_size_x> grid;
+
+        Mix_Chunk* TetrisMusic;
+        Mix_Chunk* ButtonClick;
+        Mix_Chunk* Score;
+        
 
         // powerup ids:
         //  0 = none
@@ -357,6 +365,7 @@ namespace FantasyGameEngine
                         for (std::size_t x = 0; x < grid_size_x; x++)
                             grid[x][0] = 0;
                         score += 10;
+                        Mix_PlayChannel(-1, game_state.Score, 0);
                     }
                 }
             }
@@ -486,19 +495,13 @@ namespace FantasyGameEngine
 
     } game_state;
 
-  /* std::vector<std::tuple<std::string, int>> score()
-    {
-
-
-    }*/ 
-
     void run(
         FGE_InitFunc init_func,
         FGE_UpdateFunc update_func,
         FGE_RenderFunc render_func,
         double tick_length_ms)
     {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0)
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
         {
             fprintf(stderr, "failed to initialize sdl2: %s\n", SDL_GetError());
             return;
@@ -533,12 +536,15 @@ namespace FantasyGameEngine
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+        
 
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.Fonts->AddFontFromFileTTF("assets/PublicPixel.ttf", 18.0f, NULL, NULL);
 
         ImGui::StyleColorsDark();
+
+        Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
         ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
         ImGui_ImplSDLRenderer_Init(renderer);
@@ -547,7 +553,7 @@ namespace FantasyGameEngine
         fge_state.font = TTF_OpenFont("assets/tahoma.ttf", 32);
         print_sdl_error("after TTF_OpenFont");
 
-        ImVec4 clear_color = ImVec4(0.85f, 0.55f, 0.60f, 1.00f);
+        ImVec4 clear_color = ImVec4(0.85f, 0.85f, 0.60f, 1.00f);
 
         FGE_Inputs last_inputs = {};
         FGE_Inputs inputs = {};
@@ -565,7 +571,14 @@ namespace FantasyGameEngine
         double tick_timer = 0;
 
         init_func(&r);
-
+        
+        //Mix_Music* backgroundSound = Mix_LoadMUS("Tema jogo portfolio.mp3");
+        //Mix_Chunk* jumpEffect = Mix_LoadWAV("assets/Tetris.wav");
+        //Mix_Chunk* laserEffect = Mix_LoadWAV("LaserEffect.wav");
+        
+        
+  
+      
         bool running = true;
         while (game_state.uirenderer.running)
         {
@@ -690,12 +703,24 @@ namespace FantasyGameEngine
         srand((unsigned)time(NULL));
         game_state.currentpiececoloroffset = 1+rand() % 8; 
         game_state.nextpiececolor = 1 + rand() % 8;
-       
+        game_state.TetrisMusic = Mix_LoadWAV("assets/Tetris.wav");
+        game_state.ButtonClick = Mix_LoadWAV("assets/Button(click).wav");
+        game_state.Score = Mix_LoadWAV("assets/Button(class).wav");
+        
+        Mix_Volume(-1, MIX_MAX_VOLUME / 2);
+        Mix_Volume(1, 20);
     }
 
     void update(const FGE_Inputs& inputs)
     {
+     
+            
         if (game_state.uirenderer.isinGame) {
+            if (!game_state.musicplaying) {
+                Mix_PlayChannel(1, game_state.TetrisMusic, -1);
+                game_state.musicplaying = true;
+            }
+            
            if(!game_state.checkgameover()) {
             game_state.tick_timer++;
             if (!game_state.uirenderer.ispaused) {
@@ -738,10 +763,14 @@ namespace FantasyGameEngine
             if (inputs.pressed & FGEKC_esc) game_state.uirenderer.ispaused = !game_state.uirenderer.ispaused;
             if (game_state.uirenderer.ispaused) 
             {
+                Mix_Pause(1);
+                game_state.musicplaying = false;
                 if (inputs.pressed & FGEKC_w) game_state.uirenderer.pausebutton -= 1;
                 if (inputs.pressed & FGEKC_s) game_state.uirenderer.pausebutton += 1;
                 game_state.uirenderer.checkbuttonint();
-                if (inputs.pressed & FGEKC_enter) game_state.uirenderer.HandleInput();
+                if (inputs.pressed & FGEKC_enter) { Mix_PlayChannel(-1, game_state.ButtonClick, 0); game_state.uirenderer.HandleInput(); }
+
+
             }
            }
            else {
@@ -749,7 +778,8 @@ namespace FantasyGameEngine
                game_state.uirenderer.isenteringName = true;
                game_state.uirenderer.isinGame = false;
                game_state.uirenderer.Gamestarted = false;
-               
+               Mix_Pause(1);
+               game_state.musicplaying = false;
            }
         }
         else{
@@ -764,7 +794,7 @@ namespace FantasyGameEngine
                 if (inputs.pressed & FGEKC_w) game_state.uirenderer.gamemodebutton -= 1;
                 if (inputs.pressed & FGEKC_s) game_state.uirenderer.gamemodebutton += 1;
             }
-            if (inputs.pressed & FGEKC_enter) game_state.uirenderer.HandleInput();
+            if (inputs.pressed & FGEKC_enter) { Mix_PlayChannel(-1, game_state.ButtonClick, 0); game_state.uirenderer.HandleInput(); }
         }
         if (game_state.uirenderer.isenteringName)
         {
@@ -774,7 +804,7 @@ namespace FantasyGameEngine
             if (inputs.down & FGEKC_d) game_state.uirenderer.index += 1;
 
             game_state.uirenderer.checkbuttonint();
-            if (inputs.pressed & FGEKC_enter) game_state.uirenderer.HandleInput();
+            if (inputs.pressed & FGEKC_enter) { Mix_PlayChannel(-1, game_state.ButtonClick, 0); game_state.uirenderer.HandleInput(); }
         }
         if (game_state.uirenderer.nameconfirmed) game_state.uirenderer.addscore(game_state.score);
         if (game_state.uirenderer.startnewgame) 
@@ -834,7 +864,7 @@ namespace FantasyGameEngine
             for (std::size_t row_i = 0; row_i < columns[col_i].size(); row_i++)
             {
                 if (columns[col_i][row_i] != 0) {
-                    game_state.FieldRenderer.RenderBlock(game_state.nextpiececolor * columns[col_i][row_i], game_state.FieldRenderer.gridoffset.x + 600 + 25 * col_i, 100 + 25 * row_i, cell_size_x, cell_size_y);
+                    game_state.FieldRenderer.RenderBlock(game_state.nextpiececolor * columns[col_i][row_i], game_state.FieldRenderer.gridoffset.x + 600 + 25 * row_i, 100 + 25 * col_i, cell_size_x, cell_size_y);
                 }
          }
         }
@@ -848,7 +878,7 @@ namespace FantasyGameEngine
                 for (std::size_t row_i = 0; row_i < columns[col_i].size(); row_i++)
                 {
                     if (columns[col_i][row_i] != 0) {
-                        game_state.FieldRenderer.RenderBlock(game_state.holdpiececolor * columns[col_i][row_i], game_state.FieldRenderer.gridoffset.x + 600 + 25 * col_i, 300 + 25 * row_i, cell_size_x, cell_size_y);
+                        game_state.FieldRenderer.RenderBlock(game_state.holdpiececolor * columns[col_i][row_i], game_state.FieldRenderer.gridoffset.x + 600 + 25 * row_i, 300 + 25 * col_i, cell_size_x, cell_size_y);
                     }
                 }
         }
@@ -901,10 +931,6 @@ namespace FantasyGameEngine
         {
             game_state.uirenderer.draw_score_ui();
         }
-        //game_state.uirenderer.draw_score_ui();
-
-        
-
     }
 }
 

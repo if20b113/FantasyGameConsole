@@ -13,9 +13,19 @@ find_library(SDL2_IMAGE_LIB_PATH
     NAMES SDL2_image
     PATHS "${CMAKE_SOURCE_DIR}/external_deps/sdl2_image/lib/x64/")
 
+find_library(SDL2_MIXER_LIB_PATH
+    NAMES SDL2_mixer
+    PATHS "${CMAKE_SOURCE_DIR}/external_deps/sdl2_mixer")
+
+find_library(CRYPTOPP_LIB_PATH
+    NAMES CRYPTLIB_MD
+    PATHS "${CMAKE_SOURCE_DIR}/external_deps/CryptoPP/")
+
 message(STATUS "found sdl2 as ${SDL2_LIB_PATH}")
 message(STATUS "found sdl2_ttf as ${SDL2_TTF_LIB_PATH}")
 message(STATUS "found sdl2_image as ${SDL2_IMAGE_LIB_PATH}")
+message(STATUS "found sdl2_mixer as ${SDL2_MIXER_LIB_PATH}")
+message(STATUS "found CryptoPP as ${CRYPTOPP_LIB_PATH}")
 
 add_library(sdl2 STATIC IMPORTED)
 set_target_properties(sdl2 PROPERTIES
@@ -31,6 +41,16 @@ add_library(sdl2_image STATIC IMPORTED)
 set_target_properties(sdl2_image PROPERTIES
     IMPORTED_LOCATION "${SDL2_IMAGE_LIB_PATH}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external_deps/sdl2_image/include")
+
+add_library(sdl2_mixer STATIC IMPORTED)
+set_target_properties(sdl2_mixer PROPERTIES
+    IMPORTED_LOCATION "${SDL2_MIXER_LIB_PATH}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external_deps/sdl2_mixer/include")
+
+add_library(cryptlib_md STATIC IMPORTED)
+set_target_properties(cryptlib_md PROPERTIES
+    IMPORTED_LOCATION "${CRYPTOPP_LIB_PATH}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external_deps/CryptoPP/include")
 
 # RMLUI Wants these libs as packages
     set(FreeType_DIR "${CMAKE_SOURCE_DIR}/external_deps/freetype/")
@@ -58,4 +78,4 @@ target_link_libraries(sol2 INTERFACE lua)
 target_include_directories(sol2 INTERFACE sol2/include)
 
 add_library(external_deps INTERFACE)
-target_link_libraries(external_deps INTERFACE sdl2 sdl2_ttf sdl2_image imgui sqlite3 sol2 glm)
+target_link_libraries(external_deps INTERFACE sdl2 sdl2_ttf sdl2_image sdl2_mixer imgui sqlite3 sol2 glm cryptlib_md)

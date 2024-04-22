@@ -15,20 +15,6 @@ void FantasyGameEngine::UIRenderer::init(const FGE_Renderer* renderer, int width
 	this->m_height = height;
 	this->m_width = width;
 
-	std::tuple<std::string, int> testtuple;
-
-	testtuple = std::make_tuple("Test1", 10);
-
-	scores.push_back(testtuple);
-
-	testtuple = std::make_tuple("Test2", 8);
-
-	scores.push_back(testtuple);
-
-	testtuple = std::make_tuple("Test3", 7);
-
-	scores.push_back(testtuple);
-
 	calculate_ui_positions();
 }
 
@@ -38,7 +24,7 @@ void FantasyGameEngine::UIRenderer::draw_ui()
 	{
 		if (isinMainMenu)
 		{
-			FantasyGameEngine::render_image(m_renderer, { 5,5 }, { 150,100 }, m_logo);
+			FantasyGameEngine::render_image(m_renderer, { 5,5 }, { 200,150 }, m_logo);
 
 			FantasyGameEngine::render_image(m_renderer, title_pos, { 400,200 }, m_title);
 
@@ -103,11 +89,16 @@ void FantasyGameEngine::UIRenderer::draw_ui()
 		}
 		if (isinControls)
 		{
-			render_text(m_renderer, { m_width / 2, 5 }, "Controls");
+			render_text(m_renderer, { m_width / 2 - 100, 5 }, "Controls");
+			render_text(m_renderer, { m_width / 2 - 150, m_height/ 2 - 100 }, "W,S...Rotate Piece");
+			render_text(m_renderer, { m_width / 2 - 150, m_height / 2 -50 }, "A,D...Move Piece Left or Right");
+			render_text(m_renderer, { m_width / 2 - 150, m_height / 2 }, "H...Hold Piece");
+			render_text(m_renderer, { m_width / 2 - 150, m_height / 2 +50}, "E...Use Powerup");
+			render_text(m_renderer, { m_width / 2 - 150, m_height / 2 +100}, "ESC...Pause/Unpause Game");
 		}
 		if (selectGameMode) 
 		{
-			FantasyGameEngine::render_image(m_renderer, { 5,5 }, { 150,100 }, m_logo);
+			FantasyGameEngine::render_image(m_renderer, { 5,5 }, { 200,150 }, m_logo);
 
 			FantasyGameEngine::render_image(m_renderer, title_pos, { 400,200 }, m_title);
 
@@ -213,7 +204,7 @@ void FantasyGameEngine::UIRenderer::HandleInput()
 				}
 				break;
 			case 3:
-				
+				loadgame = true;
 				selectGameMode = false;
 				break;
 			case 4:
@@ -233,6 +224,10 @@ void FantasyGameEngine::UIRenderer::HandleInput()
 			ispaused = false;
 			isinGame = false;
 			isinMainMenu = true;
+		}
+		else 
+		{
+			savegame = true;
 		}
 	}
 	if (isenteringName) 
