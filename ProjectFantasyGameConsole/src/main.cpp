@@ -15,6 +15,7 @@
 #include "CollisionDetection.hpp"
 #include "TetrisRenderer.h"
 #include "UIRenderer.h"
+#include "SaveData.h"
 
 namespace FantasyGameEngine
 {
@@ -154,6 +155,7 @@ namespace FantasyGameEngine
         FGE_ImageHandle blocks;
         TetrisRenderer FieldRenderer;
         UIRenderer uirenderer;
+        SaveData SaveGame;
         
 
         glm::ivec2 active_piece_pos = { 5, 0 };
@@ -713,8 +715,6 @@ namespace FantasyGameEngine
 
     void update(const FGE_Inputs& inputs)
     {
-     
-            
         if (game_state.uirenderer.isinGame) {
             if (!game_state.musicplaying) {
                 Mix_PlayChannel(1, game_state.TetrisMusic, -1);
@@ -770,6 +770,13 @@ namespace FantasyGameEngine
                 game_state.uirenderer.checkbuttonint();
                 if (inputs.pressed & FGEKC_enter) { Mix_PlayChannel(-1, game_state.ButtonClick, 0); game_state.uirenderer.HandleInput(); }
 
+                if (game_state.uirenderer.savegame) 
+                {
+                    int i = 0;
+                    game_state.SaveGame.SaveFile(i,game_state.grid);
+
+                    game_state.uirenderer.savegame = false;
+                }
 
             }
            }
@@ -793,6 +800,16 @@ namespace FantasyGameEngine
             {
                 if (inputs.pressed & FGEKC_w) game_state.uirenderer.gamemodebutton -= 1;
                 if (inputs.pressed & FGEKC_s) game_state.uirenderer.gamemodebutton += 1;
+
+               
+            }
+            if (game_state.uirenderer.loadgame)
+            {
+                int i = 0;
+                game_state.SaveGame.LoadFile(i, game_state.grid);
+                // printf("loadGame");
+                game_state.uirenderer.loadgame = false;
+                game_state.uirenderer.isinGame = true;
             }
             if (inputs.pressed & FGEKC_enter) { Mix_PlayChannel(-1, game_state.ButtonClick, 0); game_state.uirenderer.HandleInput(); }
         }

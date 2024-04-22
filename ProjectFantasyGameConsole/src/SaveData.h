@@ -9,7 +9,7 @@ class SaveData
 private:
 	std::vector< unsigned char > m_saveData;
 	int saveFile{ 1 }; // 1-3
-	void GameFieldToSaveStructure(std::array < std::array<int, 45>, 25> const& inField)
+	void GameFieldToSaveStructure(std::array < std::array<int, 25>, 15> const& inField)
 	{
 		MemoryData mem;
 		for (auto it : inField)
@@ -18,7 +18,7 @@ private:
 		m_saveData.reserve(mem.GetData().size());
 		m_saveData.swap(mem.GetData());
 	}
-	bool SaveStructureToGameField(std::vector<unsigned char>& inData, std::array < std::array<int, 45>, 25>& outField)
+	bool SaveStructureToGameField(std::vector<unsigned char>& inData, std::array < std::array<int, 25>, 15>& outField)
 	{
 		MemoryData mem;
 		mem.GetData().reserve(inData.size());
@@ -33,7 +33,7 @@ private:
 	}
 public:
 
-	bool SaveFile(int& saveFile, std::array < std::array<int, 45>, 25> const& inField)
+	bool SaveFile(int& saveFile, std::array < std::array<int, 25>, 15> const& inField)
 	{
 		this->saveFile = saveFile;
 		GameFieldToSaveStructure(inField);
@@ -50,7 +50,7 @@ public:
 		return fileIo.SaveSaveFile(saveFile, m_saveData);
 	}
 
-	bool LoadFile(int& saveFile, std::array < std::array<int, 45>, 25>& outField)
+	bool LoadFile(int& saveFile, std::array < std::array<int, 25>, 15>& outField)
 	{
 		this->saveFile = saveFile;
 		if (!m_saveData.empty())
